@@ -24,9 +24,7 @@ class FindHintsCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
         full_path = self.view.file_name()
-        file_name = os.path.basename(full_path)
-        directory_path = os.path.dirname(full_path)
-        hints_file = os.path.join(directory_path, file_name.rsplit('.', 1)[0] + '.hints')
+        hints_file = full_path + ".hints"
         if not os.path.exists(hints_file):
             logging.info("Hint file %s not found", hints_file)
             return
