@@ -29,7 +29,7 @@ class FindHintsCommand(sublime_plugin.TextCommand):
             logging.info("Hint file %s not found", hints_file)
             return
         try:
-            hints_file = HintFile.load_json(hints_file)
+            hints_file = HintFile.load_json(self.view, hints_file)
         except HintFormatError:
             logging.exception("Can't load hint file %s", hints_file)
         else:

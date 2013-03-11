@@ -3,11 +3,16 @@ Hints object internal representation.
 """
 import json
 from datetime import datetime
+import functools
+import sublime
 
 ISO8601_DATE_FORMAT = '%Y-%m-%d'
 
 class HintFormatError(Exception):
     pass
+class HintsFileNotFoundError(Exception):
+    pass
+
 
 class Hint(object):
     def __init__(self, text, places):
@@ -15,7 +20,10 @@ class Hint(object):
         self.places = places
 
     @classmethod
-    def from_json(cls, json_obj):
+    def from_json(cls, original_view, json_obj):
+        def list_to_region(lst):
+            return sublime.Region(original_view.text_point(lst[0], lst[1]), original_view.text_point(lst[2], lst[3]))
+
         if 'text' not in json_obj:
             raise HintFormatError('Illegal hint format: Field `text` is missing')
         text = json_obj.pop('text')
@@ -23,7 +31,7 @@ class Hint(object):
             raise HintFormatError('Illegal hint format: Field `places` is missing')
         places = json_obj.pop('places')
         try:
-            places = map(lambda lst: ((lst[0], lst[1]), (lst[2], lst[3])), places)
+            places = map(list_to_region, places)
         except (TypeError, IndexError):
             raise HintFormatError('Illegal places format %s' % places)
         if json_obj:
@@ -65,12 +73,13 @@ class HintFile(object):
         self.hints = hints
 
     @classmethod
-    def load_json(cls, file_name):
-        with open(file_name, 'r') as hints_file:
+    def load_json(cls, original_view, json_file_name):
+        with open(json_file_name, 'r') as hints_file:
             json_obj = json.load(hints_file)
             if 'hints' not in json_obj:
                 raise HintFormatError('Illegal hint file format: field `hints` is missing')
-            hints = map(Hint.from_json, json_obj.pop('hints'))
+            partial_from_json = functools.partial(Hint.from_json, original_view)
+            hints = map(partial_from_json, json_obj.pop('hints'))
             meta = Meta.from_json(json_obj)
             return cls(meta, hints)
 
