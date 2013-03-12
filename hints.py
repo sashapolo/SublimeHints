@@ -22,12 +22,12 @@ class Hint(object):
     @classmethod
     def from_json(cls, view, json_obj):
         def list_to_region(lst):
-            begin_line = view.line(sublime.Region(lst[0], 0))
-            if lst[1] > begin_line.end():
-                lst[1] = begin_line.end()
-            end_line = view.line(sublime.Region(lst[2], 0))
-            if lst[3] > end_line.end():
-                lst[3] = end_line.end()
+            begin_line = view.line(view.text_point(lst[0], 0))
+            if lst[1] > begin_line.size():  
+                lst[1] = begin_line.size()
+            end_line = view.line(view.text_point(lst[2], 0))
+            if lst[3] > end_line.size():
+                lst[3] = end_line.size()
             return sublime.Region(view.text_point(lst[0], lst[1]), view.text_point(lst[2], lst[3]))
 
         if 'text' not in json_obj:

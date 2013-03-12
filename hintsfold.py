@@ -53,7 +53,7 @@ class AllHintsFoldedCommand(sublime_plugin.TextCommand):
 
 
     def format_hint(self, hint):
-        equals = "\n" + 20*"=" + "\n"
+        equals = "\n" + 20 * "=" + "\n"
         return  equals + hint.text + equals
 
     def insert_hints(self, hints):
@@ -64,13 +64,14 @@ class AllHintsFoldedCommand(sublime_plugin.TextCommand):
                 single_hints.append(Hint(hint.text, [place]))
         # сортировка этого списка по убыванию старшей границы диапазона хинта
         single_hints.sort(None, key=lambda h: h.places[0].end(), reverse=True)
-        print single_hints
+        
+        self.fhf.add_regions("basic_text", map(lambda hint: hint.places[0], single_hints), "comment", "dot", sublime.DRAW_OUTLINED)
         for hint in single_hints:
-            self.insert_hint(hint)
-
-
-    def insert_hint(self, hint):
+            self.insert_hint(hint, regions)
+       
+    def insert_hint(self, hint, regions):
         for place in hint.places:
             text = self.format_hint(hint)
             self.fhf.insert(self.fhf_edit, place.end(), text)
             self.fhf.fold(sublime.Region(place.end(), place.end()+len(text)))
+            

@@ -1,6 +1,8 @@
+ # -*- coding: cp1251 -*-
 import os, sys
 from hints import *
 import logging
+
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -37,3 +39,9 @@ class FindHintsCommand(sublime_plugin.TextCommand):
             def on_load(selected):
                 logging.debug('Hint: %s selected', hints_file.hints[selected])
             active_window.show_quick_panel([hint.text for hint in hints_file.hints], on_load)
+
+
+class AllHintsFoldedCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        import hintsfold
+        hintsfold.AllHintsFoldedCommand.run(self, edit)
