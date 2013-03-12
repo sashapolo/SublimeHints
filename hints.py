@@ -20,9 +20,15 @@ class Hint(object):
         self.places = places
 
     @classmethod
-    def from_json(cls, original_view, json_obj):
+    def from_json(cls, view, json_obj):
         def list_to_region(lst):
-            return sublime.Region(original_view.text_point(lst[0], lst[1]), original_view.text_point(lst[2], lst[3]))
+            begin_line = view.line(sublime.Region(lst[0], 0))
+            if lst[1] > begin_line.end():
+                lst[1] = begin_line.end()
+            end_line = view.line(sublime.Region(lst[2], 0))
+            if lst[3] > end_line.end():
+                lst[3] = end_line.end()
+            return sublime.Region(view.text_point(lst[0], lst[1]), view.text_point(lst[2], lst[3]))
 
         if 'text' not in json_obj:
             raise HintFormatError('Illegal hint format: Field `text` is missing')
@@ -73,12 +79,12 @@ class HintFile(object):
         self.hints = hints
 
     @classmethod
-    def load_json(cls, original_view, json_file_name):
+    def load_json(cls, view, json_file_name):
         with open(json_file_name, 'r') as hints_file:
             json_obj = json.load(hints_file)
             if 'hints' not in json_obj:
                 raise HintFormatError('Illegal hint file format: field `hints` is missing')
-            partial_from_json = functools.partial(Hint.from_json, original_view)
+            partial_from_json = functools.partial(Hint.from_json, view)
             hints = map(partial_from_json, json_obj.pop('hints'))
             meta = Meta.from_json(json_obj)
             return cls(meta, hints)

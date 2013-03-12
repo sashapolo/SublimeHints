@@ -71,4 +71,6 @@ class AllHintsFoldedCommand(sublime_plugin.TextCommand):
 
     def insert_hint(self, hint):
         for place in hint.places:
-            self.fhf.insert(self.fhf_edit, place.b, self.format_hint(hint))
+            text = self.format_hint(hint)
+            self.fhf.insert(self.fhf_edit, place.end(), text)
+            self.fhf.fold(sublime.Region(place.end(), place.end()+len(text)))
