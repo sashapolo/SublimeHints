@@ -36,3 +36,6 @@ nosetests.xml
 
 # PyCharm
 .idea
+
+# Apache Docbook output
+doc/spec/docbook/output/*
