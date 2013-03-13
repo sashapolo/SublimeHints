@@ -67,9 +67,9 @@ class AllHintsFoldedCommand(sublime_plugin.TextCommand):
         
         self.fhf.add_regions("basic_text", map(lambda hint: hint.places[0], single_hints), "comment", "dot", sublime.DRAW_OUTLINED)
         for hint in single_hints:
-            self.insert_hint(hint, regions)
+            self.insert_hint(hint)
        
-    def insert_hint(self, hint, regions):
+    def insert_hint(self, hint):
         for place in hint.places:
             text = self.format_hint(hint)
             self.fhf.insert(self.fhf_edit, place.end(), text)
