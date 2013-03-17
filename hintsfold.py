@@ -3,6 +3,7 @@
 from hints import *
 import logging
 import os
+import string
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -53,8 +54,27 @@ class AllHintsFoldedCommand(sublime_plugin.TextCommand):
 
 
     def format_hint(self, hint):
-        equals = "\n" + 20 * "=" + "\n"
-        return  equals + hint.text + equals
+        u"""
+        Форматирование текста хинта для вставки во временный файл. Текущий формат:
+           ==========Hint==========
+           Текст хинта
+           ========================
+        Вначале каждой строки вставлено по 3 пробела для формирования блока сворачивания текста
+        """
+        header = "=" * 10  + "Hint" + "=" * 10 + "\n"
+        equals = "\n" + "=" * 24  + "\n"
+        text = header + hint.text + equals
+        lines = map(lambda s: 3 * " " + s.lstrip(), text.splitlines())
+        text = "\n" + string.join(lines, "\n")
+        # Проверка необходимости завершающего перевода строки. 
+        # Он необходим если текст, к которому относится хинт заканчивается не в конце строки
+        end_line = self.view.line(hint.places[0].end())
+        _, end_col = self.view.rowcol(end_line.end())
+        _, col = self.view.rowcol(hint.places[0].end())
+        if col < end_col:
+            return text + "\n"
+        else:
+            return text
 
     def insert_hints(self, hints):
         # формирование списка хинтов, где каждый хинт отнесен к ровно одной области
