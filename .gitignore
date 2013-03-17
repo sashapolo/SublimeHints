@@ -39,3 +39,6 @@ nosetests.xml
 
 # Apache Docbook output
 doc/spec/docbook/output/*
+
+# Eclipse
+.settings
