@@ -42,7 +42,7 @@ Marks
 
 - ctrl+k, ctrl+space - add mark
 - ctrl+k, ctrl+g - clear mark
-- 
+-
 
 
 
