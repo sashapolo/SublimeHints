@@ -120,7 +120,11 @@
     "modified" : "",
     "author" : "",
     "createdWith" : "",
-    "sourceFileHash" : ""
+    "sourceFileHash" : "",
+    "tags" : [
+        "tag1",
+        "tag2"
+    ],
     "hints": [
         {
             "text": "Ham! Spam! Spam! Spam! Eggs! Sausages!",
