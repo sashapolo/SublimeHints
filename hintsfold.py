@@ -1,4 +1,4 @@
- # -*- coding: cp1251 -*-
+ # -*- coding: utf-8 -*-
 
 from hints import *
 import logging
@@ -23,7 +23,7 @@ class AllHintsFoldedCommand(sublime_plugin.TextCommand):
         try:
             hints_file = self.load_hints_file()
         except (HintsFileNotFoundError, HintFormatError) as ex:
-            logging.exception(ex)	
+            logging.exception(ex)
             return
 
         self.fhf = self.view.window().new_file() # fhf = fold_hint_file
