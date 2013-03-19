@@ -8,8 +8,11 @@ import sublime
 
 ISO8601_DATE_FORMAT = '%Y-%m-%d'
 
+
 class HintFormatError(Exception):
     pass
+
+
 class HintsFileNotFoundError(Exception):
     pass
 
