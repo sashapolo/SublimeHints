@@ -19,12 +19,12 @@ class ShowHintsCommand(sublime_plugin.TextCommand):
             logging.exception(ex)
             return
         self.print_hints(hints_file.hints)
+        self.highlight_hints(hints_file.hints)
 
     def load_hints_file(self):
         hints_file = self.view.file_name() + ".hints"
         if not os.path.exists(hints_file):
             raise HintsFileNotFoundError("Hint file %s not found" % hints_file)
-
         hints_file = HintFile.load_json(self.view, hints_file)
         return hints_file
 
@@ -46,12 +46,24 @@ class ShowHintsCommand(sublime_plugin.TextCommand):
             result += "(" + str(row) + ":" + str(col) + ")) "
         return result + "\n\n" + hint.text + "\n\n"
 
+    def highlight_hints(self, hints):
+        regions = {"hints": []}
+        for hint in hints:
+            for region in hint.places:
+                regions["hints"].append(region)
+        self.highlight_regions(regions)
+
+    def highlight_regions(self, regions):
+        self.view.add_regions("hints", regions["hints"], "string", "bookmark", sublime.DRAW_OUTLINED)
+
     def print_hints(self, hints):
         panel = self.view.window().get_output_panel("hints")
         panel.set_read_only(False)
         edit = panel.begin_edit()
-        panel.erase(edit, sublime.Region(0, panel.size()))
-        panel.insert(edit, panel.size(), self.format_hints(hints))
-        panel.end_edit(edit)
-        panel.set_read_only(True)
+        try:
+            panel.erase(edit, sublime.Region(0, panel.size()))
+            panel.insert(edit, panel.size(), self.format_hints(hints))
+        finally:
+            panel.set_read_only(True)
+            panel.end_edit(edit)
         self.view.window().run_command("show_panel", {"panel": "output.hints"})
