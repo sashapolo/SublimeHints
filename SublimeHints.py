@@ -1,3 +1,5 @@
+ # -*- coding: utf-8 -*-
+
 import os, sys
 from hints import *
 import logging
@@ -17,13 +19,18 @@ except ImportError:
 # don't forget about correct .pth file in your path pointing to Sublime installation
 import sublime_plugin
 
-class FetchAndLoadHints(sublime_plugin.EventListener):
-    pass
-
-class FindHintsCommand(sublime_plugin.TextCommand):
-    """Try to find file with hints and show them in separate window."""
-
+class ForceReloadCommand(sublime_plugin.TextCommand):
     def run(self, edit):
+        # in sublime internal environment the following doesn't work
+        # path = os.path.realpath(__file__)
+        path = os.path.join(sublime.packages_path(), __name__, __file__)
+        logging.debug('Reloading file: %s' % path)
+        sublime_plugin.reload_plugin(path)
+
+class HintsRenderer(sublime_plugin.TextCommand):
+    def run(self, edit):
+        self.edit = edit
+        self.window = sublime.active_window()
         full_path = self.view.file_name()
         hints_file = full_path + ".hints"
         if not os.path.exists(hints_file):
@@ -34,10 +41,16 @@ class FindHintsCommand(sublime_plugin.TextCommand):
         except HintFormatError:
             logging.exception("Can't load hint file %s", hints_file)
         else:
-            active_window = sublime.active_window()
-            def on_load(selected):
-                logging.debug('Hint: %s selected', hints_file.hints[selected])
-            active_window.show_quick_panel([hint.text for hint in hints_file.hints], on_load)
+            self.render(hints_file)
+
+    def render(self, hints_file):
+        raise NotImplementedError('HintsRenderer command should not be called directly')
+
+class DumbRendererCommand(HintsRenderer):
+    def render(self, hints_file):
+        def on_load(selected):
+            logging.debug('Hint: %s selected', hints_file.hints[selected])
+        self.window.show_quick_panel([hint.text for hint in hints_file.hints], on_load)
 
 
 class AllHintsFoldedCommand(sublime_plugin.TextCommand):
