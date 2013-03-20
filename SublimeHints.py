@@ -4,20 +4,15 @@ import os, sys
 from hints import *
 import logging
 
+import sublime
+import sublime_plugin
+
+# insert plugin directory in path
+PLUGIN_DIRECTORY = os.path.join(sublime.packages_path(), __name__)
+if PLUGIN_DIRECTORY not in sys.path:
+    sys.path.insert(0, PLUGIN_DIRECTORY)
 
 logging.basicConfig(level=logging.DEBUG)
-
-# if plugins was launched with internal Sublime python interpreter
-# sublime module will be available, otherwise use stub
-
-try:
-    import sublime
-except ImportError:
-    sys.path.append(os.path.join(os.path.dirname(__file__), 'util'))
-    import sublime
-
-# don't forget about correct .pth file in your path pointing to Sublime installation
-import sublime_plugin
 
 class ForceReloadCommand(sublime_plugin.TextCommand):
     def run(self, edit):
@@ -51,6 +46,11 @@ class DumbRendererCommand(HintsRenderer):
         def on_load(selected):
             logging.debug('Hint: %s selected', hints_file.hints[selected])
         self.window.show_quick_panel([hint.text for hint in hints_file.hints], on_load)
+
+class ShowPathCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        import pprint
+        pprint.pprint(sys.path)
 
 
 class AllHintsFoldedCommand(sublime_plugin.TextCommand):
