@@ -14,28 +14,9 @@ except ImportError:
     import sublime
 
 
-class OutputPanelHintsCommand(HintsRenderer):
+class HighlightHintsCommand(HintsRenderer):
     def render(self, hints_file):
-        self.print_hints(hints_file.hints)
         self.highlight_hints(hints_file.hints)
-
-    def format_hints(self, hints):
-        result = self.view.file_name() + ":\n"
-        i = 1
-        for hint in hints:
-            result += "=" * 8 + " Hint " + str(i) + " " + "=" * 8 + "\n"
-            result += self.format_hint(hint)
-            i += 1
-        return result
-
-    def format_hint(self, hint):
-        result = ""
-        for region in hint.places:
-            (row, col) = self.view.rowcol(region.begin())
-            result += "((" + str(row) + ":" + str(col) + ") - "
-            (row, col) = self.view.rowcol(region.end())
-            result += "(" + str(row) + ":" + str(col) + ")) "
-        return result + "\n\n" + hint.text + "\n\n"
 
     def highlight_hints(self, hints):
         regions = {"hints": []}
@@ -47,18 +28,46 @@ class OutputPanelHintsCommand(HintsRenderer):
     def highlight_regions(self, regions):
         self.view.add_regions("hints",
                               regions["hints"],
-                              "string",
+                              "comment",
                               "bookmark",
                               sublime.DRAW_OUTLINED)
 
-    def print_hints(self, hints):
+
+class DisplaySelectedHintsCommand(HintsRenderer):
+    def render(self, hints_file):
         panel = self.view.window().get_output_panel("hints")
         panel.set_read_only(False)
         edit = panel.begin_edit()
         try:
             panel.erase(edit, sublime.Region(0, panel.size()))
-            panel.insert(edit, panel.size(), self.format_hints(hints))
+            self.print_hints(hints_file.hints, edit, panel)
         finally:
             panel.set_read_only(True)
             panel.end_edit(edit)
         self.view.window().run_command("show_panel", {"panel": "output.hints"})
+
+    def print_hints(self, hints, edit, panel):
+        panel.insert(edit, panel.size(), self.view.file_name() + ":\n")
+        displayed_hints = set()
+        # this piece of code is fucked up
+        for region in self.view.sel():
+            for hint in hints:
+                if hint not in displayed_hints:
+                    for hint_region in hint.places:
+                        if hint_region.intersects(region):
+                            self.print_hint(hint, edit, panel)
+                            displayed_hints.add(hint)
+                            break
+
+    def print_hint(self, hint, edit, panel):
+        panel.insert(edit, panel.size(), "=" * 8 + " Hint " + "=" * 8 + "\n")
+        panel.insert(edit, panel.size(), self.format_hint(hint))
+
+    def format_hint(self, hint):
+        result = ""
+        for region in hint.places:
+            (row, col) = self.view.rowcol(region.begin())
+            result += "(line " + str(row) + ", column " + str(col) + ") -- "
+            (row, col) = self.view.rowcol(region.end())
+            result += "(line " + str(row) + ", column " + str(col) + ")\n"
+        return result + "\n" + hint.text + "\n\n"
