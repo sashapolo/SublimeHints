@@ -1,0 +1,4 @@
+[
+    {"keys": ["super+shift+h"], "command": "highlight_hints" },
+    {"keys": ["super+shift+d"], "command": "display_selected_hints" }
+]

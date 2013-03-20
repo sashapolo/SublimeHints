@@ -66,8 +66,9 @@ class DisplaySelectedHintsCommand(HintsRenderer):
     def format_hint(self, hint):
         result = ""
         for region in hint.places:
-            (row, col) = self.view.rowcol(region.begin())
-            result += "(line " + str(row) + ", column " + str(col) + ") -- "
-            (row, col) = self.view.rowcol(region.end())
-            result += "(line " + str(row) + ", column " + str(col) + ")\n"
+            result += self.format_rowcol(*self.view.rowcol(region.begin())) + " -- "
+            result += self.format_rowcol(*self.view.rowcol(region.end())) + "\n"
         return result + "\n" + hint.text + "\n\n"
+
+    def format_rowcol(self, row, col):
+        return "(line " + str(row + 1) + ", column " + str(col + 1) + ")"
