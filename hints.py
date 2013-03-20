@@ -4,7 +4,11 @@ Hints object internal representation.
 import json
 from datetime import datetime
 import functools
-import sublime
+try:
+    import sublime
+except ImportError:
+    sys.path.append(os.path.join(os.path.dirname(__file__), 'util'))
+    import sublime
 
 ISO8601_DATE_FORMAT = '%Y-%m-%d'
 
@@ -26,7 +30,7 @@ class Hint(object):
     def from_json(cls, view, json_obj):
         def list_to_region(lst):
             begin_line = view.line(view.text_point(lst[0], 0))
-            if lst[1] > begin_line.size():  
+            if lst[1] > begin_line.size():
                 lst[1] = begin_line.size()
             end_line = view.line(view.text_point(lst[2], 0))
             if lst[3] > end_line.size():
@@ -76,6 +80,7 @@ class Meta(object):
     def __str__(self):
         return '<Meta:' + ' '.join('%s=%s' % (k, v) for k, v in self.__dict__.items()) + '>'
 
+
 class HintFile(object):
     def __init__(self, meta, hints):
         self.meta = meta
@@ -94,5 +99,3 @@ class HintFile(object):
 
     def __str__(self):
         return '<Hint file for %s (hash=%s)>' % (self.meta.file, self.meta.md5sum)
-
-

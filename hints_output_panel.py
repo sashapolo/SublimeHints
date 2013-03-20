@@ -4,29 +4,20 @@ Created on Mar 17, 2013
 @author: alexander
 '''
 
-from hints import HintsFileNotFoundError, HintFormatError, HintFile
-import logging
+from SublimeHints import HintsRenderer
 import os
-import sublime
-import sublime_plugin
+import sys
+try:
+    import sublime
+except ImportError:
+    sys.path.append(os.path.join(os.path.dirname(__file__), 'util'))
+    import sublime
 
 
-class ShowHintsCommand(sublime_plugin.TextCommand):
-    def run(self, edit):
-        try:
-            hints_file = self.load_hints_file()
-        except (HintsFileNotFoundError, HintFormatError) as ex:
-            logging.exception(ex)
-            return
+class OutputPanelHintsCommand(HintsRenderer):
+    def render(self, hints_file):
         self.print_hints(hints_file.hints)
         self.highlight_hints(hints_file.hints)
-
-    def load_hints_file(self):
-        hints_file = self.view.file_name() + ".hints"
-        if not os.path.exists(hints_file):
-            raise HintsFileNotFoundError("Hint file %s not found" % hints_file)
-        hints_file = HintFile.load_json(self.view, hints_file)
-        return hints_file
 
     def format_hints(self, hints):
         result = self.view.file_name() + ":\n"
@@ -54,7 +45,11 @@ class ShowHintsCommand(sublime_plugin.TextCommand):
         self.highlight_regions(regions)
 
     def highlight_regions(self, regions):
-        self.view.add_regions("hints", regions["hints"], "string", "bookmark", sublime.DRAW_OUTLINED)
+        self.view.add_regions("hints",
+                              regions["hints"],
+                              "string",
+                              "bookmark",
+                              sublime.DRAW_OUTLINED)
 
     def print_hints(self, hints):
         panel = self.view.window().get_output_panel("hints")
