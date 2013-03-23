@@ -119,6 +119,3 @@ class ShowPathCommand(sublime_plugin.TextCommand):
         import pprint
 
         pprint.pprint(sys.path)
-
-
-from hintsfold import AllHintsFoldedCommand
