@@ -4,11 +4,7 @@ Hints object internal representation.
 import json
 from datetime import datetime
 import functools
-try:
-    import sublime
-except ImportError:
-    sys.path.append(os.path.join(os.path.dirname(__file__), 'util'))
-    import sublime
+import sublime
 
 ISO8601_DATE_FORMAT = '%Y-%m-%d'
 

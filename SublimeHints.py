@@ -119,3 +119,5 @@ class ShowPathCommand(sublime_plugin.TextCommand):
         import pprint
 
         pprint.pprint(sys.path)
+
+from hint_editor import *

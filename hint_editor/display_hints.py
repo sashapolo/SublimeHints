@@ -1,39 +1,52 @@
 '''
 Created on Mar 17, 2013
 
-@author: alexander
+@author: snowball
 '''
 
 from SublimeHints import HintsRenderer
-import os
-import sys
-try:
-    import sublime
-except ImportError:
-    sys.path.append(os.path.join(os.path.dirname(__file__), 'util'))
-    import sublime
+import sublime_plugin
+import sublime
 
 
 class HighlightHintsCommand(HintsRenderer):
-    def render(self, hints_file):
-        self.highlight_hints(hints_file.hints)
+    _regions_key = "highlighter"
+    _highlighted_views = {}
 
-    def highlight_hints(self, hints):
-        regions = {"hints": []}
+    def render(self, hints_file):
+        highlighted = self._highlighted_views.setdefault(self.view.id, False)
+
+        if not highlighted:
+            self.highlight_hints(self.view, hints_file.hints, self._regions_key, "comment")
+            self._highlighted_views[self.view.id] = True
+        else:
+            self.view.erase_regions(self._regions_key)
+            self._highlighted_views[self.view.id] = False
+
+    @staticmethod
+    def highlight_hints(view, hints, name, style):
+        regions = {name: []}
         for hint in hints:
             for region in hint.places:
-                regions["hints"].append(region)
-        self.highlight_regions(regions)
+                regions[name].append(region)
+        HighlightHintsCommand.highlight_regions(view, regions, name, style)
 
-    def highlight_regions(self, regions):
-        self.view.add_regions("hints",
-                              regions["hints"],
-                              "comment",
-                              "bookmark",
-                              sublime.DRAW_OUTLINED)
+    @staticmethod
+    def highlight_regions(view, regions, name, style):
+        view.add_regions(name,
+                         regions[name],
+                         style,
+                         "bookmark",
+                         sublime.DRAW_OUTLINED | sublime.DRAW_EMPTY_AS_OVERWRITE)
 
 
 class DisplaySelectedHintsCommand(HintsRenderer):
+    _regions_key = "selecter"
+
+    @classmethod
+    def get_regions_key(self):
+        return self._regions_key
+
     def render(self, hints_file):
         panel = self.view.window().get_output_panel("hints")
         panel.set_read_only(False)
@@ -59,6 +72,11 @@ class DisplaySelectedHintsCommand(HintsRenderer):
                             displayed_hints.add(hint)
                             break
 
+        HighlightHintsCommand.highlight_hints(self.view,
+                                              displayed_hints,
+                                              self._regions_key,
+                                              "string")
+
     def print_hint(self, hint, edit, panel):
         panel.insert(edit, panel.size(), "=" * 8 + " Hint " + "=" * 8 + "\n")
         panel.insert(edit, panel.size(), self.format_hint(hint))
@@ -71,4 +89,11 @@ class DisplaySelectedHintsCommand(HintsRenderer):
         return result + "\n" + hint.text + "\n\n"
 
     def format_rowcol(self, row, col):
-        return "(line " + str(row + 1) + ", column " + str(col + 1) + ")"
+        return "(line " + str(row + 1) + ", col " + str(col + 1) + ")"
+
+
+class ClearEditSelectionCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        self.view.erase_regions(DisplaySelectedHintsCommand.get_regions_key())
+        panel = self.view.window().get_output_panel("hints")
+        self.view.window().run_command("hide_panel")
