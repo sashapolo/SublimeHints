@@ -5,20 +5,72 @@ import sys
 from hints import *
 import logging
 
+import sublime
+import sublime_plugin
+
+# insert plugin directory in path
+PLUGIN_DIRECTORY = os.path.join(sublime.packages_path(), __name__)
+if PLUGIN_DIRECTORY not in sys.path:
+    sys.path.insert(0, PLUGIN_DIRECTORY)
 
 logging.basicConfig(level=logging.DEBUG)
 
-# if plugins was launched with internal Sublime python interpreter
-# sublime module will be available, otherwise use stub
 
-try:
-    import sublime
-except ImportError:
-    sys.path.append(os.path.join(os.path.dirname(__file__), 'util'))
-    import sublime
+class SublimeUtilMixin(object):
+    """Auxiliary mixin class that adds various helper methods
+     to indeed rather clumsy Sublime Text API
+     """
 
-# don't forget about correct .pth file in your path pointing to Sublime installation
-import sublime_plugin
+    def __init__(self, *args, **kwargs):
+        super(SublimeUtilMixin, self).__init__(*args, **kwargs)
+        self.window = self.view.active_window()
+        self.settings = self.view.settings()
+
+    def file_region(self):
+        """Returns sublime.Region instance including whole content of
+        buffer
+        """
+        return sublime.Region(0, self.view.size())
+
+    def file_content(self):
+        """Returns whole file content as string"""
+        return self.view.substr(self.file_region())
+
+    def line_region(self, lineno):
+        """Returns specified line as sublime.Region.
+        If line index is out of range the values is (lastchar, lastchar)
+        Line numbers start from zero.
+        """
+        return self.view.line(self.view.text_point(lineno, 0))
+
+    def line_content(self, lineno):
+        """Returns content of specified line or empty string if line number
+        is out of range.
+        Line numbers start from zero.
+        """
+        return self.view.substr(self.line_region(lineno))
+
+    def lines_regions(self, start=0, end=None):
+        """Returns lines of buffer as list of elements of type sublime
+        .Region"""
+        return self.view.lines(self.file_region())[start:end]
+
+    def lines_content(self, start=0, end=None):
+        """Returns lines of buffer as list of strings"""
+        return map(self.view.substr, self.lines_regions(start, end))
+
+
+class TestCommand(sublime_plugin.TextCommand, SublimeUtilMixin):
+    folded = False
+
+    def run(self, edit, lineno):
+        regions = self.lines_regions(0, 5)
+        area = regions[0].cover(regions[-1])
+        if TestCommand.folded:
+            self.view.unfold(area)
+        else:
+            self.view.fold(area)
+        TestCommand.folded = not TestCommand.folded
 
 
 class ForceReloadCommand(sublime_plugin.TextCommand):
@@ -31,9 +83,11 @@ class ForceReloadCommand(sublime_plugin.TextCommand):
 
 
 class HintsRenderer(sublime_plugin.TextCommand):
+    def __init__(self, *args, **kwargs):
+        super(HintsRenderer, self).__init__(*args, **kwargs)
+
     def run(self, edit):
         self.edit = edit
-        self.window = sublime.active_window()
         full_path = self.view.file_name()
         hints_file = full_path + ".hints"
         if not os.path.exists(hints_file):
@@ -47,17 +101,21 @@ class HintsRenderer(sublime_plugin.TextCommand):
             self.render(hints_file)
 
     def render(self, hints_file):
-        raise NotImplementedError('HintsRenderer command should not be called directly')
+        raise NotImplementedError(
+            'HintsRenderer should not be called directly')
 
 
 class DumbRendererCommand(HintsRenderer):
     def render(self, hints_file):
         def on_load(selected):
             logging.debug('Hint: %s selected', hints_file.hints[selected])
-        self.window.show_quick_panel([hint.text for hint in hints_file.hints], on_load)
+
+        self.window.show_quick_panel([hint.text for hint in hints_file.hints],
+                                     on_load)
 
 
-class AllHintsFoldedCommand(sublime_plugin.TextCommand):
+class ShowPathCommand(sublime_plugin.TextCommand):
     def run(self, edit):
-        import hintsfold
-        hintsfold.AllHintsFoldedCommand.run(self, edit)
+        import pprint
+
+        pprint.pprint(sys.path)

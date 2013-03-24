@@ -37,8 +37,10 @@ nosetests.xml
 # PyCharm
 .idea
 
-# Apache Docbook output
-doc/spec/docbook/output/*
-
 # Eclipse
 .settings
+
+# Apache Docbook
+doc/spec/docbook/docbook-xml-4.5
+doc/spec/docbook/docbook-xsl-1.78.0
+doc/spec/docbook/output
