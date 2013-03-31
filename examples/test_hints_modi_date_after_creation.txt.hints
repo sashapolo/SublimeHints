@@ -1,0 +1,17 @@
+// Error - wrong modify date
+{
+    "created" : "2013-03-31:17:50:00",
+    "modified" : "2013-02-31:18:02:00",
+    "author" : "Skotnikov",
+    "createdWith" : "",
+    "sourceFileHash" : "",
+    "tags" : [
+        "tag1"
+    ],
+    "hints": [
+    {
+        "text": "This is hint text No.1. It's got two regions",
+        "places": [ [0, 0, 3, 80], [5, 10, 9, 30] ]
+    }
+]
+}
