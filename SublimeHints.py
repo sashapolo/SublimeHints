@@ -83,8 +83,8 @@ class ForceReloadCommand(sublime_plugin.TextCommand):
 
 
 class HintsRenderer(sublime_plugin.TextCommand):
-    def __init__(self, *args, **kwargs):
-        super(HintsRenderer, self).__init__(*args, **kwargs)
+    #def __init__(self, *args, **kwargs):
+    #    super(HintsRenderer, self).__init__(*args, **kwargs)
 
     def run(self, edit):
         self.edit = edit
@@ -119,3 +119,5 @@ class ShowPathCommand(sublime_plugin.TextCommand):
         import pprint
 
         pprint.pprint(sys.path)
+
+from double_view import *
