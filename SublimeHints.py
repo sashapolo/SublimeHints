@@ -4,6 +4,7 @@ import os
 import sys
 from hints import *
 import logging
+import tempfile
 
 import sublime
 import sublime_plugin
@@ -23,7 +24,7 @@ class SublimeUtilMixin(object):
 
     def __init__(self, *args, **kwargs):
         super(SublimeUtilMixin, self).__init__(*args, **kwargs)
-        self.window = self.view.active_window()
+        self.window = self.view.window()
         self.settings = self.view.settings()
 
     def file_region(self):
@@ -59,18 +60,66 @@ class SublimeUtilMixin(object):
         """Returns lines of buffer as list of strings"""
         return map(self.view.substr, self.lines_regions(start, end))
 
+    def _initialize_buffer(self, view, content=None, name=None, readonly=False, scratch=False):
+        logging.debug('In _initialize_buffer')
+        if content:
+            edit = view.begin_edit()
+            try:
+                logging.debug('Editing tempfile')
+                view.insert(edit, 0, content)
+            finally:
+                view.end_edit(edit)
+        if name:
+            view.set_name(name)
+        view.set_read_only(readonly)
+        view.set_scratch(scratch)
 
-class TestCommand(sublime_plugin.TextCommand, SublimeUtilMixin):
+    def new_file(self, content=None, name=None, readonly=False, scratch=False):
+        """Opens new empty tab and optionally sets its name and fill buffer
+        with content.
+        Scratch option means that Sublime will not show such file as modified
+        (dirty) and will not ask you to save it on close.
+        """
+        new_view = self.window.new_file()
+        self._initialize_buffer(new_view, content, name, readonly, scratch)
+        return new_view
+
+    def temp_file(self, suffix='', prefix='', content=None, name=None,
+                  readonly=False,
+                  scratch=False):
+        """Creates new temporary file. Prefix and suffix is added to randomly
+        generated name. All other options are the same as in new_file method.
+        """
+        import time
+        _, filename = tempfile.mkstemp(suffix, prefix)
+        new_view = self.window.open_file(filename)
+        for i in range(10):
+            if not new_view.is_loading():
+                break
+            print '=',
+            time.sleep(1)
+        self._initialize_buffer(new_view, 'Eggs', name, readonly, scratch)
+        return new_view
+
+
+class TestCommand(SublimeUtilMixin, sublime_plugin.TextCommand):
     folded = False
 
-    def run(self, edit, lineno):
-        regions = self.lines_regions(0, 5)
-        area = regions[0].cover(regions[-1])
-        if TestCommand.folded:
-            self.view.unfold(area)
-        else:
-            self.view.fold(area)
-        TestCommand.folded = not TestCommand.folded
+    def run(self, edit):
+        # regions = self.lines_regions(0, 5)
+        # area = regions[0].cover(regions[-1])
+        # if TestCommand.folded:
+        #     self.view.unfold(area)
+        # else:
+        #     self.view.fold(area)
+        # TestCommand.folded = not TestCommand.folded
+        # self.new_file(self.file_content(), name='Eggs', readonly=True, scratch=True)
+        # logging.debug(self.file_content())
+        f = self.temp_file(prefix='tmp', content=self.file_content(), name='foo')
+        e = f.begin_edit()
+        f.insert(e, 0, 'spam!')
+        f.end_edit(e)
+        self.window.focus_view(self.view)
 
 
 class ForceReloadCommand(sublime_plugin.TextCommand):
