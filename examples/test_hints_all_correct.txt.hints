@@ -1,0 +1,38 @@
+// Hints example file , where everything is correct
+{
+    "created" : "2013-03-31:17:50:00",
+    "modified" : "2013-03-31:18:02:00",
+    "author" : "Skotnikov",
+    "createdWith" : "",
+    "sourceFileHash" : "",
+    "tags" : [
+        "tag1",
+        "tag2"
+    ],
+    "hints": [
+    {
+        "text": "This is hint text No.1. It's got two regions",
+        "places": [ [0, 0, 3, 80], [5, 10, 9, 30] ]
+    },
+    {
+        "text": "Hint No2 - one region",
+        "places": [ [13, 0, 13, 82] ]
+    },
+	{
+        "text": "Hint No3 - overlay with hint No4",
+        "places": [ [21, 0, 21, 30] ]
+    },
+	{
+        "text": "Hint No4 - overlay with hint No3",
+        "places": [ [21, 15, 21, 120] ]
+    },
+	{
+        "text": "Hint No5 - Warning - it contains no region!",
+        "places": [ [26, 5, 26, 5] ]
+    },
+	{
+        "text": "Hint No6 - Warning - ends on empty string!",
+        "places": [ [27, 0, 38, 0] ]
+    }
+]
+}
