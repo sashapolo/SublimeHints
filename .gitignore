@@ -44,3 +44,6 @@ doc/spec/docbook/output
 
 # NoseXUnit
 target/
+# Had to bundle nose because it's the most proper way to add it
+# to Sublime's internal Python runtime.
+nose/
