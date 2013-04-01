@@ -5,39 +5,26 @@ Created on Mar 17, 2013
 '''
 
 from SublimeHints import HintsRenderer
-import sublime_plugin
-import sublime
+from hint_editor.HintsHighlighter import HintsHighlighter
 
 
 class HighlightHintsCommand(HintsRenderer):
     _regions_key = "highlighter"
     _highlighted_views = {}
 
+    @classmethod
+    def get_regions_key(self):
+        return self._regions_key
+
     def render(self, hints_file):
         highlighted = self._highlighted_views.setdefault(self.view.id, False)
-
+        highlighter = HintsHighlighter(self.view, hints_file.hints)
         if not highlighted:
-            self.highlight_hints(self.view, hints_file.hints, self._regions_key, "comment")
+            highlighter.highlight_hints(self._regions_key, "comment")
             self._highlighted_views[self.view.id] = True
         else:
-            self.view.erase_regions(self._regions_key)
+            highlighter.unhighlight_hints(self._regions_key)
             self._highlighted_views[self.view.id] = False
-
-    @staticmethod
-    def highlight_hints(view, hints, name, style):
-        regions = {name: []}
-        for hint in hints:
-            for region in hint.places:
-                regions[name].append(region)
-        HighlightHintsCommand.highlight_regions(view, regions, name, style)
-
-    @staticmethod
-    def highlight_regions(view, regions, name, style):
-        view.add_regions(name,
-                         regions[name],
-                         style,
-                         "bookmark",
-                         sublime.DRAW_OUTLINED | sublime.DRAW_EMPTY_AS_OVERWRITE)
 
 
 class DisplaySelectedHintsCommand(HintsRenderer):
@@ -48,38 +35,43 @@ class DisplaySelectedHintsCommand(HintsRenderer):
         return self._regions_key
 
     def render(self, hints_file):
-        panel = self.view.window().get_output_panel("hints")
-        panel.set_read_only(False)
-        edit = panel.begin_edit()
+        self.hints = hints_file.hints
+        if self.view.window().num_groups() == 1:
+            self.hint_view = self.create_hints_view()
+        self.hint_view.window().run_command('move_to_group', {"group": 1})
+        edit = self.hint_view.begin_edit()
         try:
-            panel.erase(edit, sublime.Region(0, panel.size()))
-            self.print_hints(hints_file.hints, edit, panel)
+            self.print_hints(edit)
         finally:
-            panel.set_read_only(True)
-            panel.end_edit(edit)
-        self.view.window().run_command("show_panel", {"panel": "output.hints"})
+            self.hint_view.end_edit(edit)
 
-    def print_hints(self, hints, edit, panel):
-        panel.insert(edit, panel.size(), self.view.file_name() + ":\n")
+    def create_hints_view(self):
+        self.view.window().run_command('set_layout',
+                                       { "cols":  [0.0, 0.5, 1.0],
+                                         "rows":  [0.0, 1.0],
+                                         "cells": [[0, 0, 1, 1], [1, 0, 2, 1]]
+                                       })
+        return self.view.window().new_file()
+
+    def print_hints(self, edit):
+        self.hint_view.insert(edit, self.hint_view.size(), self.view.file_name() + ":\n")
         displayed_hints = set()
         # this piece of code is fucked up
         for region in self.view.sel():
-            for hint in hints:
+            for hint in self.hints:
                 if hint not in displayed_hints:
                     for hint_region in hint.places:
                         if hint_region.intersects(region):
-                            self.print_hint(hint, edit, panel)
+                            self.print_hint(hint, edit)
                             displayed_hints.add(hint)
                             break
 
-        HighlightHintsCommand.highlight_hints(self.view,
-                                              displayed_hints,
-                                              self._regions_key,
-                                              "string")
+        highlighter = HintsHighlighter(self.view, displayed_hints)
+        highlighter.highlight_hints(self._regions_key, "string")
 
-    def print_hint(self, hint, edit, panel):
-        panel.insert(edit, panel.size(), "=" * 8 + " Hint " + "=" * 8 + "\n")
-        panel.insert(edit, panel.size(), self.format_hint(hint))
+    def print_hint(self, hint, edit):
+        self.hint_view.insert(edit, self.hint_view.size(), "=" * 8 + " Hint " + "=" * 8 + "\n")
+        self.hint_view.insert(edit, self.hint_view.size(), self.format_hint(hint))
 
     def format_hint(self, hint):
         result = ""
@@ -92,8 +84,12 @@ class DisplaySelectedHintsCommand(HintsRenderer):
         return "(line " + str(row + 1) + ", col " + str(col + 1) + ")"
 
 
-class ClearEditSelectionCommand(sublime_plugin.TextCommand):
-    def run(self, edit):
-        self.view.erase_regions(DisplaySelectedHintsCommand.get_regions_key())
-        panel = self.view.window().get_output_panel("hints")
-        self.view.window().run_command("hide_panel")
+class ClearEditSelectionCommand(HintsRenderer):
+    def render(self, hints_file):
+        highlighter = HintsHighlighter(self.view, hints_file.hints)
+        highlighter.unhighlight_hints(DisplaySelectedHintsCommand.get_regions_key())
+        self.view.window().run_command('set_layout',
+                                       { "cols":  [0.0],
+                                         "rows":  [0.0, 1.0],
+                                         "cells": [[0, 0, 1, 1], [1, 0, 2, 1]]
+                                       })
