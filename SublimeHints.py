@@ -4,6 +4,7 @@ import os
 import sys
 from hints import *
 import logging
+from subprocess import call
 
 import sublime
 import sublime_plugin
@@ -119,3 +120,7 @@ class ShowPathCommand(sublime_plugin.TextCommand):
         import pprint
 
         pprint.pprint(sys.path)
+
+class TestPluginCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        call(["nosetests", "--with-nosexunit"])
