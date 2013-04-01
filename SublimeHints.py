@@ -14,6 +14,8 @@ PLUGIN_DIRECTORY = os.path.join(sublime.packages_path(), __name__)
 if PLUGIN_DIRECTORY not in sys.path:
     sys.path.insert(0, PLUGIN_DIRECTORY)
 
+import nose
+
 logging.basicConfig(level=logging.DEBUG)
 
 
@@ -162,9 +164,7 @@ class DumbRendererCommand(HintsRenderer):
         self.window.show_quick_panel([hint.text for hint in hints_file.hints],
                                      on_load)
 
-
 class ShowPathCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         import pprint
-
         pprint.pprint(sys.path)
