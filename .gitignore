@@ -41,3 +41,6 @@ nosetests.xml
 doc/spec/docbook/docbook-xml-4.5
 doc/spec/docbook/docbook-xsl-1.78.0
 doc/spec/docbook/output
+
+# NoseXUnit
+target/
