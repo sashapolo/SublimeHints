@@ -1,0 +1,18 @@
+// Error - out of document
+{
+    "created" : "2013-03-31:17:50:00",
+    "modified" : "2013-03-31:18:02:00",
+    "author" : "Skotnikov",
+    "createdWith" : "",
+    "sourceFileHash" : "",
+    "tags" : [
+        "tag1",
+        "tag2"
+    ],
+    "hints": [
+	{
+        "text": "Hint No1 - out of document range",
+        "places": [ [80, 0, 85, 100] ]
+    }
+]
+}
