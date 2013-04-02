@@ -122,6 +122,6 @@ class ShowPathCommand(sublime_plugin.TextCommand):
 
 class TestPluginCommand(sublime_plugin.TextCommand):
     def run(self, edit):
-        import testhintsload
-        testhintsload._current_view = self.view
-        nose.run(argv=['--where', PLUGIN_DIRECTORY])
+        from test import testhints
+        testhints._current_view = self.view
+        nose.run(argv=['--where', PLUGIN_DIRECTORY + "/test"])
