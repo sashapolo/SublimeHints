@@ -1,1 +1,2 @@
 import testhints
+import testplugin
