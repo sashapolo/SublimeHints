@@ -1,12 +1,11 @@
 import logging
 import os
+import test
 
 from hints import HintFile, HintFormatError
 from nose.tools import raises
 
-_current_view = None
-
-class TestHintsLoader:
+class TestHintsLoader(object):
     """Hints loader tests"""
 
     @raises(HintFormatError)
@@ -18,4 +17,4 @@ class TestHintsLoader:
         if not os.path.exists(hints_file_name):
             logging.info("Hint file %s not found", hints_file_name)
             return
-        HintFile.load_json(_current_view, hints_file_name)
+        HintFile.load_json(test._current_view, hints_file_name)
