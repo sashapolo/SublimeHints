@@ -14,6 +14,8 @@ PLUGIN_DIRECTORY = os.path.join(sublime.packages_path(), __name__)
 if PLUGIN_DIRECTORY not in sys.path:
     sys.path.insert(0, PLUGIN_DIRECTORY)
 
+import nose
+
 logging.basicConfig(level=logging.DEBUG)
 
 
@@ -166,3 +168,5 @@ class ShowPathCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         import pprint
         pprint.pprint(sys.path)
+
+from test import TestPluginCommand
