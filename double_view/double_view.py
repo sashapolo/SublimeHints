@@ -2,15 +2,17 @@ import sublime, sublime_plugin
 import SublimeHints
 import hints
 import textwrap
+import synchro
 
-class DoubleViewHintsCommand(SublimeHints.HintsRenderer):
+class DoubleViewHintsCommand(SublimeHints.HintsRenderer, SublimeHints.SublimeUtilMixin):
     def render(self, hints_file):
         self.hints_file = hints_file
         self.separator = 0.7
         self.text_view = self.view
         self.hint_view = self.__create_double_view__(self.separator)
         self.hint_view_width = self.__calculate_width__(self.hint_view)
-        self.hint_view = HintView(self.hint_view, hints_file.hints, self.text_view, width = self.hint_view_width)
+        self.hint_view_height = self.__calculate_height__()
+        self.hint_view = HintView(self.hint_view, hints_file.hints, self.text_view, self.hint_view_height, width = self.hint_view_width)
         self.__highlight_text__()
         self.__setup_views__()
 
@@ -26,12 +28,20 @@ class DoubleViewHintsCommand(SublimeHints.HintsRenderer):
     def __calculate_width__(self, view):
         w, h = view.viewport_extent()
         return w//view.em_width()
+
+    def __calculate_height__(self):
+        return self.file_content().count("\n")
       
     def __highlight_text__(self):
         self.text_view.add_regions("text_highlight", map(lambda x: x.text_place, self.hint_view.get_hints()), "comment", "bookmark")  
 
     def __setup_views__(self):
         self.hint_view.view.set_read_only(True)
+        self.synchro = synchro.Synchronizer()
+        self.synchro.add_view(self.text_view)
+        self.synchro.add_view(self.hint_view.view)
+        self.synchro.run()
+        self.view.window().focus_view(self.view)
 
 
 
@@ -86,10 +96,14 @@ class HintPanel(object):
     def get_content(self):
         return self.content
 
+    def content_height(self):
+        return self.content.count("\n")
+
 
 class HintView(object):
-    def __init__(self, view, hints, text_view, width = 80):
+    def __init__(self, view, hints, text_view, height, width = 80):
         self.view = view
+        self.height = height
         self.hint_panel = HintPanel(hints, text_view, width)
         self.content = self.__form_content__()
         edit = self.view.begin_edit()
@@ -99,7 +113,12 @@ class HintView(object):
             self.view.end_edit(edit)
 
     def __form_content__(self):
-        return self.hint_panel.get_content()
+        if self.height > self.hint_panel.content_height():
+            content = self.hint_panel.get_content()
+            content += "\n" * (self.height - self.hint_panel.content_height())
+        else:
+            content = self.hint_panel.get_content()
+        return content
 
     def get_hints(self):
         return self.hint_panel.hints_repr
