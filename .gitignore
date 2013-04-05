@@ -49,3 +49,4 @@ target/
 nose/
 # If it is a symlink
 nose
+jinja2
