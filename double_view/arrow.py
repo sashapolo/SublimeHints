@@ -34,7 +34,7 @@ class RoutedArrow(object):
 class SimpleRouter(object):
     def __init__(self, arrows):
         self.arrows = map(RoutedArrow, arrows)
-        
+
     class RoutingInfo(object):
         def __init__(self, arrow):
             self.arrow = arrow
@@ -45,6 +45,8 @@ class SimpleRouter(object):
         width1 = self.__same_line__()
         width2 = self.__parallel_arrows__()
         self.width = max([width1, width2])
+        for arrow in self.arrows:
+            arrow.end[1] = self.width - 1
         return self.arrows
 
     @staticmethod
@@ -137,6 +139,7 @@ class SimpleDrawer(object):
         return string_module.join(self.content, "\n")
 
     def __draw_arrow__(self, arrow):
+        #print arrow.start, arrow.end, arrow.vertical
         hshift = arrow.start[1]
         vshift = arrow.start[0]
         hsize = arrow.end[1] - arrow.start[1] + 1
@@ -145,7 +148,7 @@ class SimpleDrawer(object):
         if vsize == 1:
             arrow_string = Symbols.arrow + Symbols.hor * (hsize - 1)
             string = self.content[vshift]
-            string = string[:hshift] + arrow_string + string[hshift + hsize - 1:]
+            string = string[:hshift] + arrow_string + string[hshift + hsize:]
             self.content[vshift] = string
         else:
             first_hsize = arrow.vertical - hshift + 1
@@ -153,10 +156,11 @@ class SimpleDrawer(object):
             last_hsize = hsize - first_hsize + 1
             last_string = Symbols.right_angle + (Symbols.hor * (last_hsize - 1))
             string = self.content[vshift]
-            string = string[:hshift] + first_string + string[hshift + first_hsize - 1:]
+            string = string[:hshift] + first_string + string[hshift + first_hsize:]
             self.content[vshift] = string
             string = self.content[vshift + vsize - 1]
-            string = string[:hshift + first_hsize - 1] + last_string + string[hshift + hsize - 1:]
+            string = string[:hshift + first_hsize - 1] + last_string + string[hshift + hsize:]
             self.content[vshift + vsize - 1] = string
-            for i in range(vshift + 1, vshift + vsize - 2):
+            for i in range(vshift + 1, vshift + vsize - 1):
+                print i
                 self.content[i] = self.content[i][:arrow.vertical] + Symbols.ver + self.content[i][arrow.vertical + 1:]
