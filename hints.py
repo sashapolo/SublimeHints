@@ -6,7 +6,7 @@ from datetime import datetime
 import functools
 import sublime
 
-ISO8601_DATE_FORMAT = '%Y-%m-%d'
+ISO8601_DATE_FORMAT = '%Y-%m-%d:%H:%M:%S'
 
 class HintFormatError(Exception):
     pass
