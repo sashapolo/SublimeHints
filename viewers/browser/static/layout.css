@@ -7,6 +7,10 @@ html, body {
     /*height: 100%;*/
 }
 
+code {
+    font-family: monospace;
+}
+
 #container {
     margin: 0 auto;
     width: 960px;
@@ -39,6 +43,7 @@ html, body {
     height: 100%;
     /*padding: 0.5em;*/
     background: rgb(119, 119, 119);
+    overflow: scroll;
 }
 
 #code-pane>* {
