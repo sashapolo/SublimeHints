@@ -9,15 +9,24 @@ import tempfile
 import sublime
 import sublime_plugin
 
-# insert plugin directory in path
+# insert plugin and third-party libraries directories in path
+# NOTE: it can't be determined as os.path.dirname(__file__) in sublime interpreter
 PLUGIN_DIRECTORY = os.path.join(sublime.packages_path(), __name__)
+LIB_DIRECTORY = os.path.join(PLUGIN_DIRECTORY, 'lib')
 if PLUGIN_DIRECTORY not in sys.path:
     sys.path.insert(0, PLUGIN_DIRECTORY)
-    sys.path.insert(0, os.path.join(PLUGIN_DIRECTORY, 'lib'))
+    sys.path.insert(0, LIB_DIRECTORY)
 
-import nose
+# Logging setup
 
-logging.basicConfig(level=logging.DEBUG)
+# plugin root logger
+logger = logging.getLogger('SublimeHints')
+logger.setLevel(logging.DEBUG)
+console_handler = logging.StreamHandler()
+console_handler.setLevel(logging.DEBUG)
+console_handler.setFormatter(logging.Formatter('[%(levelname)s]:%(name)s: %(message)s'))
+logger.addHandler(console_handler)
+logger.propagate = False
 
 
 class SublimeUtilMixin(object):
@@ -130,7 +139,7 @@ class ForceReloadCommand(sublime_plugin.TextCommand):
         # in sublime internal environment the following doesn't work
         # path = os.path.realpath(__file__)
         path = os.path.join(sublime.packages_path(), __name__, __file__)
-        logging.debug('Reloading file: %s' % path)
+        logger.debug('Reloading file: %s' % path)
         sublime_plugin.reload_plugin(path)
 
 
@@ -143,14 +152,14 @@ class HintsRenderer(sublime_plugin.TextCommand):
         full_path = self.view.file_name()
         hints_file = full_path + ".hints"
         if not os.path.exists(hints_file):
-            logging.info("Hint file %s not found", hints_file)
+            logger.info("Hint file %s not found", hints_file)
             return
         try:
             hints_file = HintFile.load_json(self.view, hints_file)
         except HintFormatError:
-            logging.exception("Can't load hint file %s", hints_file)
+            logger.exception("Can't load hint file %s", hints_file)
         else:
-            print 'In renderer'
+            logger.debug('HintsRenderer.render() is called')
             self.render(hints_file)
 
     def render(self, hints_file):
