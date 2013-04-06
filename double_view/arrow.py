@@ -162,5 +162,4 @@ class SimpleDrawer(object):
             string = string[:hshift + first_hsize - 1] + last_string + string[hshift + hsize:]
             self.content[vshift + vsize - 1] = string
             for i in range(vshift + 1, vshift + vsize - 1):
-                print i
                 self.content[i] = self.content[i][:arrow.vertical] + Symbols.ver + self.content[i][arrow.vertical + 1:]
