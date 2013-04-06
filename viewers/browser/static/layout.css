@@ -7,8 +7,9 @@ html, body {
     /*height: 100%;*/
 }
 
-code {
+pre>code {
     font-family: monospace;
+    overflow: scroll;
 }
 
 #container {
@@ -43,7 +44,6 @@ code {
     height: 100%;
     /*padding: 0.5em;*/
     background: rgb(119, 119, 119);
-    overflow: scroll;
 }
 
 #code-pane>* {

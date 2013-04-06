@@ -51,13 +51,17 @@ def inject_hints(context, code):
 env.filters['inject_hints'] = inject_hints
 
 
-class BrowserViewCommand(SublimeUtilMixin, HintsRenderer):
+class BrowserViewCommand(HintsRenderer):
+    def __init__(self, view):
+        super(BrowserViewCommand, self).__init__(view)
+
     def render(self, hints_file):
         logger.debug('Module name: ' + __name__)
         logger.debug('Module path: ' + __file__)
         _, tmp_file = tempfile.mkstemp(suffix='.xhtml')
         env.get_template('layout.xhtml').stream(
-            title='stub',
+            title=self.file_name(),
+            filetype=self.file_type(),
             code=self.file_content(),
             hints=hints_file.hints
         ).dump(tmp_file, encoding='utf-8')

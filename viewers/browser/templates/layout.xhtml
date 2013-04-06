@@ -38,7 +38,7 @@
     </div>
     <div id="column-wrap">
         <div id="code-pane">
-            <pre><code>{{ code|inject_hints }}</code></pre>
+            <pre><code class="{{ filetype|d('text') }}">{{ code|inject_hints }}</code></pre>
         </div>
         <div id="hints-pane">
             {% for hint in hints %}

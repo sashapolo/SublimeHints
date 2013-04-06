@@ -33,11 +33,27 @@ class SublimeUtilMixin(object):
     """Auxiliary mixin class that adds various helper methods
      to indeed rather clumsy Sublime Text API
      """
+    logger = logging.getLogger('SublimeHints.SublimeUtilMixin')
+    logger.setLevel(logging.DEBUG)
 
     def __init__(self, *args, **kwargs):
         super(SublimeUtilMixin, self).__init__(*args, **kwargs)
         self.window = sublime.active_window()
         self.settings = self.view.settings()
+
+    def file_type(self):
+        """Returns file type associated with start of the first selection"""
+        first_cursor = self.view.sel()[0].begin()
+        return self.view.scope_name(first_cursor).split('.')[-1].strip()
+
+    def file_name(self):
+        """Returns final part of buffer name or None if it isn't saved yet"""
+        name = self.view.file_name()
+        return os.path.basename(name) if name is not None else None
+
+    def file_path(self):
+        """Returns absolute path to file or None if it isn't saved yet"""
+        return self.view.file_name()
 
     def file_region(self):
         """Returns sublime.Region instance including whole content of
@@ -73,12 +89,14 @@ class SublimeUtilMixin(object):
         return map(self.view.substr, self.lines_regions(start, end))
 
     def _initialize_buffer(self, view, content=None, name=None, readonly=False, scratch=False):
-        logging.debug('In _initialize_buffer')
+        SublimeUtilMixin.logger.debug('_initialize_buffer() called')
         if content:
+            if view.is_loading:
+                SublimeUtilMixin.logger.error("file %s can't be edited", view.file_name())
+                return
             edit = view.begin_edit()
             try:
-                logging.debug('Editing tempfile')
-                view.insert(edit, 0, content)
+                n = view.insert(edit, 0, content)
             finally:
                 view.end_edit(edit)
         if name:
@@ -96,26 +114,27 @@ class SublimeUtilMixin(object):
         self._initialize_buffer(new_view, content, name, readonly, scratch)
         return new_view
 
-    def temp_file(self, suffix='', prefix='', content=None, name=None,
-                  readonly=False,
-                  scratch=False):
+    def temp_file(self, suffix='', prefix='', content=None, name=None, readonly=False, scratch=False, focus=False):
         """Creates new temporary file. Prefix and suffix is added to randomly
         generated name. All other options are the same as in new_file method.
         """
-        import time
         _, filename = tempfile.mkstemp(suffix, prefix)
+        with open(filename, 'w') as tmp:
+            tmp.write(content)
         new_view = self.window.open_file(filename)
-        for i in range(10):
-            if not new_view.is_loading():
-                break
-            print '=',
-            time.sleep(1)
-        self._initialize_buffer(new_view, 'Eggs', name, readonly, scratch)
+        self._initialize_buffer(new_view, None, name, readonly, scratch)
+        # change focus to current view again
+        if not focus:
+            self.window.focus_view(self.view)
         return new_view
 
 
 class TestCommand(SublimeUtilMixin, sublime_plugin.TextCommand):
     folded = False
+
+    def __init__(self, view):
+        logger.debug('TestCommand initialized')
+        super(TestCommand, self).__init__(view)
 
     def run(self, edit):
         # regions = self.lines_regions(0, 5)
@@ -125,25 +144,13 @@ class TestCommand(SublimeUtilMixin, sublime_plugin.TextCommand):
         # else:
         #     self.view.fold(area)
         # TestCommand.folded = not TestCommand.folded
-        # self.new_file(self.file_content(), name='Eggs', readonly=True, scratch=True)
-        # logging.debug(self.file_content())
-        f = self.temp_file(prefix='tmp', content=self.file_content(), name='foo')
-        e = f.begin_edit()
-        f.insert(e, 0, 'spam!')
-        f.end_edit(e)
-        self.window.focus_view(self.view)
 
+        # content = '\n'.join(self.lines_content(end=10))
+        # self.temp_file(suffix='.xhtml', content=content, name='foo', focus=False)
 
-class ForceReloadCommand(sublime_plugin.TextCommand):
-    def run(self, edit):
-        # in sublime internal environment the following doesn't work
-        # path = os.path.realpath(__file__)
-        path = os.path.join(sublime.packages_path(), __name__, __file__)
-        logger.debug('Reloading file: %s' % path)
-        sublime_plugin.reload_plugin(path)
+        logger.info('File type: %s', self.file_type())
 
-
-class HintsRenderer(sublime_plugin.TextCommand):
+class HintsRenderer(SublimeUtilMixin, sublime_plugin.TextCommand):
     def __init__(self, *args, **kwargs):
         super(HintsRenderer, self).__init__(*args, **kwargs)
 
@@ -163,22 +170,7 @@ class HintsRenderer(sublime_plugin.TextCommand):
             self.render(hints_file)
 
     def render(self, hints_file):
-        raise NotImplementedError(
-            'HintsRenderer should not be called directly')
-
-
-class DumbRendererCommand(HintsRenderer):
-    def render(self, hints_file):
-        def on_load(selected):
-            logging.debug('Hint: %s selected', hints_file.hints[selected])
-
-        self.window.show_quick_panel([hint.text for hint in hints_file.hints],
-                                     on_load)
-
-class ShowPathCommand(sublime_plugin.TextCommand):
-    def run(self, edit):
-        import pprint
-        pprint.pprint(sys.path)
+        raise NotImplementedError('HintsRenderer.render() should not be called directly')
 
 from test import TestPluginCommand
 from viewers.browser import BrowserViewCommand
