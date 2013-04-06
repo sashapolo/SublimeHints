@@ -3,6 +3,8 @@ import SublimeHints
 import hints
 import textwrap
 import synchro
+import arrow
+import string
 
 class DoubleViewHintsCommand(SublimeHints.HintsRenderer, SublimeHints.SublimeUtilMixin):
     def render(self, hints_file):
@@ -71,6 +73,7 @@ class HintRepr(object):
 class HintPanel(object):
     def __init__(self, hints, text_view, width = 80):
         self.hints_repr = []
+        self.arrows = []
         for hint in hints:
             for i, place in enumerate(hint.places):
                 self.hints_repr.append(HintRepr(hint, number = i, width = width))
@@ -85,9 +88,11 @@ class HintPanel(object):
             height = hint.height
             begin, _ = text_view.rowcol(hint.text_place.begin())
             if current >= begin:
+                self.arrows.append(arrow.Arrow(begin, current))
                 content += formatted
                 current += height
             else:
+                self.arrows.append(arrow.Arrow(begin, begin))
                 content += "\n" * (begin - current)
                 content += formatted
                 current = begin + height 
@@ -99,12 +104,16 @@ class HintPanel(object):
     def content_height(self):
         return self.content.count("\n")
 
+    def get_arrows(self):
+        return self.arrows
+
 
 class HintView(object):
     def __init__(self, view, hints, text_view, height, width = 80):
         self.view = view
         self.height = height
         self.hint_panel = HintPanel(hints, text_view, width)
+        self.arrow_panel = arrow.ArrowPanel(self.hint_panel.get_arrows(), self.hint_panel.content_height())
         self.content = self.__form_content__()
         edit = self.view.begin_edit()
         try:
@@ -113,11 +122,19 @@ class HintView(object):
             self.view.end_edit(edit)
 
     def __form_content__(self):
+        hint_content = self.hint_panel.get_content().splitlines()
+        arrow_content = self.arrow_panel.get_content().splitlines()
+        content = []
+        for i in range(len(hint_content)):
+            if len(arrow_content) <= i:
+                arrow_string = " " * arrow_panel.width
+            else:
+                arrow_string = arrow_content[i]
+            hint_string = hint_content[i]
+            content.append(arrow_string + " " + hint_string)
+        content = string.join(content, "\n")
         if self.height > self.hint_panel.content_height():
-            content = self.hint_panel.get_content()
             content += "\n" * (self.height - self.hint_panel.content_height())
-        else:
-            content = self.hint_panel.get_content()
         return content
 
     def get_hints(self):

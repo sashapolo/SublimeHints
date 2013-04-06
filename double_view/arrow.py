@@ -1,6 +1,17 @@
+import string as string_module
+
 class ArrowPanel(object):
-    def __init__(self, arrows, ):
+    def __init__(self, arrows, height):
         self.arrows = arrows
+        self.height = height
+        self.router = SimpleRouter(self.arrows)
+        self.routed = self.router.route()
+        self.width = self.router.width
+        self.drawer = SimpleDrawer(self.routed, self.width, self.height)
+        self.content = self.drawer.draw()
+
+    def get_content(self):
+        return self.content
 
 
 class Arrow(object):
@@ -15,9 +26,10 @@ class RoutedArrow(object):
         end - (row. col) coordinates of arrow end point
         vertical - number of column with vertical line of arrow
         """
-        self.start = (arrow.start, 0)
-        self.end = (arrow.end, 0)
+        self.start = [arrow.start, 0]
+        self.end = [arrow.end, 0]
         self.vertical = 0
+
 
 class SimpleRouter(object):
     def __init__(self, arrows):
@@ -29,11 +41,13 @@ class SimpleRouter(object):
 
 
     def route(self):
-        self.arrows.sort(__sort_function__)
+        self.arrows.sort(SimpleRouter.__sort_function__)
         width1 = self.__same_line__()
         width2 = self.__parallel_arrows__()
         self.width = max([width1, width2])
+        return self.arrows
 
+    @staticmethod
     def __sort_function__(x, y):
         if x.start[0] < y.start[0]:
             return -1
@@ -57,7 +71,7 @@ class SimpleRouter(object):
             else:
                 curpos = arrow.start[0]
                 groups_size[curpos] = 1
-            routing = RoutingInfo(arrow)
+            routing = SimpleRouter.RoutingInfo(arrow)
             routing.same_line_number = groups_size[curpos] 
             routings.append(routing)
         maxcount = max(groups_size, key = lambda x: groups_size[x])
@@ -73,7 +87,7 @@ class SimpleRouter(object):
     def __parallel_arrows__(self):
         curend = -1
         groups_size = dict()
-        i = 0
+        i = -1
         routings = []
         for arrow in self.arrows:
             if arrow.start[0] <= curend:
@@ -81,12 +95,12 @@ class SimpleRouter(object):
                 curend = arrow.end[0]
             else:
                 curend = arrow.end[0]
+                i += 1
                 groups_size[i] = 1
-            routing = RoutingInfo(arrow)
+            routing = SimpleRouter.RoutingInfo(arrow)
             routing.group_number = i
             routing.parallel_number = groups_size[i]
-            routings.append(routing)
-            i += 1
+            routings.append(routing)            
         maxcount = max(groups_size, key = lambda x: groups_size[x])
 
         for routing in routings:
@@ -99,3 +113,50 @@ class SimpleRouter(object):
 
         self.arrow = map(lambda x: x.arrow, routings)
         return 3 + (maxcount - 1)
+
+
+class Symbols(object):
+    hor = u"\u2500"
+    ver = u"\u2502"
+    arrow = u"<"
+    left_angle = u"\u2510"
+    right_angle = u"\u2514"  
+
+
+class SimpleDrawer(object):
+    def __init__(self, routed, width, height):
+        self.routed = routed
+        self.width = width
+        self.content = []
+        for i in range(height):
+            self.content.append(" " * width)
+
+    def draw(self):
+        for arrow in self.routed:
+            self.__draw_arrow__(arrow)
+        return string_module.join(self.content, "\n")
+
+    def __draw_arrow__(self, arrow):
+        hshift = arrow.start[1]
+        vshift = arrow.start[0]
+        hsize = arrow.end[1] - arrow.start[1] + 1
+        vsize = arrow.end[0] - arrow.start[0] + 1
+        
+        if vsize == 1:
+            arrow_string = Symbols.arrow + Symbols.hor * (hsize - 1)
+            string = self.content[vshift]
+            string = string[:hshift] + arrow_string + string[hshift + hsize - 1:]
+            self.content[vshift] = string
+        else:
+            first_hsize = arrow.vertical - hshift + 1
+            first_string = Symbols.arrow + (Symbols.hor * (first_hsize - 2)) + Symbols.left_angle
+            last_hsize = hsize - first_hsize + 1
+            last_string = Symbols.right_angle + (Symbols.hor * (last_hsize - 1))
+            string = self.content[vshift]
+            string = string[:hshift] + first_string + string[hshift + first_hsize - 1:]
+            self.content[vshift] = string
+            string = self.content[vshift + vsize - 1]
+            string = string[:hshift + first_hsize - 1] + last_string + string[hshift + hsize - 1:]
+            self.content[vshift + vsize - 1] = string
+            for i in range(vshift + 1, vshift + vsize - 2):
+                self.content[i] = self.content[i][:arrow.vertical] + Symbols.ver + self.content[i][arrow.vertical + 1:]
