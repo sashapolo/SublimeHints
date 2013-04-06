@@ -13,6 +13,7 @@ import sublime_plugin
 PLUGIN_DIRECTORY = os.path.join(sublime.packages_path(), __name__)
 if PLUGIN_DIRECTORY not in sys.path:
     sys.path.insert(0, PLUGIN_DIRECTORY)
+    sys.path.insert(0, os.path.join(PLUGIN_DIRECTORY, 'lib'))
 
 import nose
 
@@ -26,7 +27,7 @@ class SublimeUtilMixin(object):
 
     def __init__(self, *args, **kwargs):
         super(SublimeUtilMixin, self).__init__(*args, **kwargs)
-        self.window = self.view.window()
+        self.window = sublime.active_window()
         self.settings = self.view.settings()
 
     def file_region(self):
@@ -149,6 +150,7 @@ class HintsRenderer(sublime_plugin.TextCommand):
         except HintFormatError:
             logging.exception("Can't load hint file %s", hints_file)
         else:
+            print 'In renderer'
             self.render(hints_file)
 
     def render(self, hints_file):
@@ -170,3 +172,4 @@ class ShowPathCommand(sublime_plugin.TextCommand):
         pprint.pprint(sys.path)
 
 from test import TestPluginCommand
+from viewers.browser import BrowserViewCommand

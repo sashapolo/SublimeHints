@@ -4,8 +4,8 @@
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-    <link rel="stylesheet" type="text/css" href="../static/reset.css"/>
-    <link rel="stylesheet" type="text/css" href="../static/layout.css"/>
+    <link rel="stylesheet" type="text/css" href="{{ static_files_dir }}/reset.css"/>
+    <link rel="stylesheet" type="text/css" href="{{ static_files_dir }}/layout.css"/>
     {# highlight.js syntax highlighting library #}
     <link rel="stylesheet" href="http://yandex.st/highlightjs/7.3/styles/monokai.min.css"/>
     <script src="http://yandex.st/highlightjs/7.3/highlight.min.js"></script>
@@ -34,7 +34,7 @@
 <body>
 <div id="container">
     <div id="header">
-        <h1>{{ header|e }}</h1>
+        <h1>Hints for {{ title|e }}</h1>
     </div>
     <div id="column-wrap">
         <div id="code-pane">
@@ -46,7 +46,7 @@
 {#                    <div class="from">{{ hint['from'] }}</div>#}
 {#                    <div class="to">{{ hint['to'] }}</div>#}
                     <div class="content">
-                        <p>{{ hint['content']|e }}</p>
+                        <p>{{ hint.text|e }}</p>
                     </div>
                 </div>
             {% endfor %}
