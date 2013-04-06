@@ -4,6 +4,8 @@ Hints object internal representation.
 import json
 from datetime import datetime
 import functools
+import hashlib
+import copy
 import sublime
 
 ISO8601_DATE_FORMAT = '%Y-%m-%d'
@@ -47,13 +49,19 @@ class Hint(object):
             raise HintFormatError('Illegal hint format: unknown fields: %s' % json_obj)
         return cls(text, places)
 
+    def to_json(self, view):
+        def region_to_list(region):
+            return list(view.rowcol(region.begin())) + list(view.rowcol(region.end()))
+
+        return {'text': self.text, 'places': map(region_to_list, self.places)}
+
     def __str__(self):
         return '<Hint: places=%(places)s text="%(text)s">' % self.__dict__
 
 
 class Meta(object):
 
-    def __init__(self, created=None, updated=None, author='unknown', md5sum=None, file=None, **kwargs):
+    def __init__(self, created = None, updated = None, author = 'unknown', md5sum = None, file = None, **kwargs):
         self.created = created
         self.updated = updated
         self.author = author
@@ -72,6 +80,16 @@ class Meta(object):
                 except ValueError:
                     raise HintFormatError('Illegal time format: %s' % timestamp)
         return cls(**json_obj)
+
+    def to_json(self):
+        self.updated = datetime.now()
+        self.md5sum = 0
+        result = copy.deepcopy(self.__dict__)
+        result["created"] = self.created.strftime(ISO8601_DATE_FORMAT)
+        result["updated"] = self.updated.strftime(ISO8601_DATE_FORMAT)
+        self.md5sum = hashlib.md5(json.dumps(result, sort_keys = True)).hexdigest()
+        result["md5sum"] = self.md5sum
+        return result
 
     def __str__(self):
         return '<Meta:' + ' '.join('%s=%s' % (k, v) for k, v in self.__dict__.items()) + '>'
@@ -92,6 +110,14 @@ class HintFile(object):
             hints = map(partial_from_json, json_obj.pop('hints'))
             meta = Meta.from_json(json_obj)
             return cls(meta, hints)
+
+    def dump_json(self, json_file_name, view):
+        with open(json_file_name, 'w') as hints_file:
+            json_obj = self.meta.to_json()
+            json_obj["hints"] = []
+            for hint in self.hints:
+                json_obj["hints"].append(hint.to_json(view))
+            json.dump(json_obj, hints_file, indent = 4)
 
     def __str__(self):
         return '<Hint file for %s (hash=%s)>' % (self.meta.file, self.meta.md5sum)

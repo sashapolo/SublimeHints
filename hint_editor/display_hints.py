@@ -6,7 +6,7 @@ Created on Mar 17, 2013
 
 from SublimeHints import HintsRenderer
 from hint_editor.HintsHighlighter import HintsHighlighter
-
+import sublime_plugin
 
 class HighlightHintsCommand(HintsRenderer):
     _regions_key = "highlighter"
@@ -84,12 +84,13 @@ class DisplaySelectedHintsCommand(HintsRenderer):
         return "(line " + str(row + 1) + ", col " + str(col + 1) + ")"
 
 
-class ClearEditSelectionCommand(HintsRenderer):
-    def render(self, hints_file):
-        highlighter = HintsHighlighter(self.view, hints_file.hints)
+# NOTE: this command works really badly, so consider it experimental
+class ClearEditSelectionCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        highlighter = HintsHighlighter(self.view)
         highlighter.unhighlight_hints(DisplaySelectedHintsCommand.get_regions_key())
         self.view.window().run_command('set_layout',
-                                       { "cols":  [0.0],
+                                       { "cols":  [0.0, 1.0],
                                          "rows":  [0.0, 1.0],
-                                         "cells": [[0, 0, 1, 1], [1, 0, 2, 1]]
+                                         "cells": [[0, 0, 1, 1]]
                                        })
