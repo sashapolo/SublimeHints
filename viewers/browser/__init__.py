@@ -3,13 +3,19 @@
 import tempfile
 import webbrowser
 import os
+import logging
 
-from SublimeHints import HintsRenderer, SublimeUtilMixin, PLUGIN_DIRECTORY
+from SublimeHints import HintsRenderer, SublimeUtilMixin, LIB_DIRECTORY
 from jinja2 import Environment, FileSystemLoader, escape, Markup, contextfilter
 
-VIEWER_DIRECTORY = os.path.join('viewers', 'browser')
-env = Environment(loader=FileSystemLoader(os.path.join(PLUGIN_DIRECTORY, VIEWER_DIRECTORY, 'templates')))
-env.globals['static_files_dir'] = os.path.join(PLUGIN_DIRECTORY, VIEWER_DIRECTORY, 'static')
+
+logger = logging.getLogger('SublimeHints.viewers.browser')
+logger.setLevel(logging.DEBUG)
+
+PACKAGE_DIRECTORY = os.path.dirname(__file__)
+env = Environment(loader=FileSystemLoader(os.path.join(PACKAGE_DIRECTORY, 'templates')))
+env.globals['static_files_location'] = os.path.join(PACKAGE_DIRECTORY, 'static')
+env.globals['highlightjs_location'] = os.path.join(LIB_DIRECTORY, 'highlight.js')
 
 @contextfilter
 def inject_hints(context, code):
@@ -47,7 +53,8 @@ env.filters['inject_hints'] = inject_hints
 
 class BrowserViewCommand(SublimeUtilMixin, HintsRenderer):
     def render(self, hints_file):
-        print 'In browser_view command'
+        logger.debug('Module name: ' + __name__)
+        logger.debug('Module path: ' + __file__)
         _, tmp_file = tempfile.mkstemp(suffix='.xhtml')
         env.get_template('layout.xhtml').stream(
             title='stub',
