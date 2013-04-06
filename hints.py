@@ -111,7 +111,7 @@ class HintFile(object):
             meta = Meta.from_json(json_obj)
             return cls(meta, hints)
 
-    def dump_json(self, json_file_name, view):
+    def dump_json(self, view, json_file_name):
         with open(json_file_name, 'w') as hints_file:
             json_obj = self.meta.to_json()
             json_obj["hints"] = []

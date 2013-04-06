@@ -1,5 +1,2 @@
 [
-    {"keys": ["ctrl+shift+h"], "command": "highlight_hints" },
-    {"keys": ["ctrl+shift+d"], "command": "display_selected_hints" },
-    {"keys": ["escape"], "command": "clear_edit_selection" }
 ]

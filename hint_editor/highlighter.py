@@ -1,7 +1,7 @@
 '''
 Created on Apr 1, 2013
 
-@author: alexander
+@author: snowball
 '''
 
 import sublime

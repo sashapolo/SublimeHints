@@ -1,1 +1,1 @@
-from display_hints import *
+from editor import *
