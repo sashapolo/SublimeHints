@@ -37,6 +37,9 @@ nosetests.xml
 # PyCharm
 .idea
 
+# Eclipse
+.settings
+
 # Apache Docbook
 doc/spec/docbook/docbook-xml-4.5
 doc/spec/docbook/docbook-xsl-1.78.0
@@ -50,3 +53,6 @@ nose/
 # If it is a symlink
 nose
 jinja2
+
+# KDE Dolphin
+.directory
