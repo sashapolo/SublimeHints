@@ -7,8 +7,13 @@
     <link rel="stylesheet" type="text/css" href="{{ static_files_location }}/reset.css"/>
     <link rel="stylesheet" type="text/css" href="{{ static_files_location }}/layout.css"/>
     {# highlight.js syntax highlighting library #}
-    <link rel="stylesheet" href="{{ highlightjs_location }}/styles/monokai.css"/>
-    <script src="{{ highlightjs_location }}/highlight.pack.js"></script>
+{#    <link rel="stylesheet" href="{{ highlightjs_location }}/styles/monokai.css"/>#}
+{#    <script src="{{ highlightjs_location }}/highlight.pack.js"></script>#}
+
+    {# from Yandex CDN for now #}
+    <link rel="stylesheet" href="http://yandex.st/highlightjs/7.3/styles/default.min.css"/>
+    <script src="http://yandex.st/highlightjs/7.3/highlight.min.js"></script>
+
     <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
     <script type="text/javascript">
         $(document).ready(function () {
