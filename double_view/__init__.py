@@ -1,0 +1,1 @@
+from double_view import DoubleViewHintsCommand
