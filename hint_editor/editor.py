@@ -7,6 +7,10 @@ Created on Mar 17, 2013
 from SublimeHints import HintsRenderer
 from hint_editor.highlighter import HintsHighlighter
 import sublime_plugin
+import sublime
+
+
+displayed_hints = {}
 
 
 class HighlightHintsCommand(HintsRenderer):
@@ -14,28 +18,29 @@ class HighlightHintsCommand(HintsRenderer):
     _highlighted_views = {}
 
     @classmethod
-    def get_regions_key(self):
-        return self._regions_key
+    def get_regions_key(cls):
+        return cls._regions_key
 
     def render(self, hints_file):
-        highlighted = self._highlighted_views.setdefault(self.view.id, False)
+        highlighted = self._highlighted_views.setdefault(self.view.id(), False)
         highlighter = HintsHighlighter(self.view, hints_file.hints)
         if not highlighted:
             highlighter.highlight_hints(self._regions_key, "comment")
-            self._highlighted_views[self.view.id] = True
+            self._highlighted_views[self.view.id()] = True
         else:
             highlighter.unhighlight_hints(self._regions_key)
-            self._highlighted_views[self.view.id] = False
+            self._highlighted_views[self.view.id()] = False
 
 
 class BeginEditHintsCommand(HintsRenderer):
     _regions_key = "editor"
 
     @classmethod
-    def get_regions_key(self):
-        return self._regions_key
+    def get_regions_key(cls):
+        return cls._regions_key
 
     def render(self, hints_file):
+        self.hints_file = hints_file
         self.hints = hints_file.hints
         self.set_layout()
         self.print_hints()
@@ -53,22 +58,26 @@ class BeginEditHintsCommand(HintsRenderer):
         return result
 
     def print_hints(self):
-        displayed_hints = set()
+        showed_hints = set()
         hint_counter = 0
         # this piece of code is fucked up
         for region in self.view.sel():
             for hint in self.hints:
-                if hint not in displayed_hints:
+                if hint not in showed_hints:
                     for hint_region in hint.places:
                         if hint_region.intersects(region):
                             hint_view = self.create_hint_view()
                             hint_counter += 1
                             hint_view.set_name("Hint " + str(hint_counter))
                             self.print_hint(hint_view, hint)
-                            displayed_hints.add(hint)
+                            showed_hints.add(hint)
+                            displayed_hints[hint_view.id()] = {"file": self.hints_file,
+                                                               "hint": hint,
+                                                               "parent_view": self.view
+                                                              }
                             break
 
-        highlighter = HintsHighlighter(self.view, displayed_hints)
+        highlighter = HintsHighlighter(self.view, showed_hints)
         highlighter.highlight_hints(self._regions_key, "string")
 
     def print_hint(self, view, hint):
@@ -83,10 +92,16 @@ class StopEditHintsCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         highlighter = HintsHighlighter(self.view)
         highlighter.unhighlight_hints(BeginEditHintsCommand.get_regions_key())
+        if self.view.id() in displayed_hints:
+            hints_file = displayed_hints[self.view.id()]["file"]
+            hint = displayed_hints[self.view.id()]["hint"]
+            hint.text = self.view.substr(sublime.Region(0, self.view.size()))
+            hints_file.dump_json(displayed_hints[self.view.id()]["parent_view"])
         self.view.window().run_command('set_layout',
                                        { "cols":  [0.0, 1.0],
                                          "rows":  [0.0, 1.0],
                                          "cells": [[0, 0, 1, 1]]
                                        })
         self.view.set_scratch(True)
+        self.view.window().run_command("close_file")
 

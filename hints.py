@@ -96,9 +96,10 @@ class Meta(object):
 
 
 class HintFile(object):
-    def __init__(self, meta, hints):
+    def __init__(self, meta, hints, file_name):
         self.meta = meta
         self.hints = hints
+        self.name = file_name
 
     @classmethod
     def load_json(cls, view, json_file_name):
@@ -109,10 +110,10 @@ class HintFile(object):
             partial_from_json = functools.partial(Hint.from_json, view)
             hints = map(partial_from_json, json_obj.pop('hints'))
             meta = Meta.from_json(json_obj)
-            return cls(meta, hints)
+            return cls(meta, hints, json_file_name)
 
-    def dump_json(self, view, json_file_name):
-        with open(json_file_name, 'w') as hints_file:
+    def dump_json(self, view):
+        with open(self.name, 'w') as hints_file:
             json_obj = self.meta.to_json()
             json_obj["hints"] = []
             for hint in self.hints:
