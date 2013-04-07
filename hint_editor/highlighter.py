@@ -14,18 +14,18 @@ class HintsHighlighter(object):
     def highlight_hints(self, key, style):
         assert (self.hints != None)
 
+        def highlight_regions(name):
+            self.view.add_regions(name,
+                                  self.regions[name],
+                                  style,
+                                  "bookmark",
+                                  sublime.DRAW_OUTLINED | sublime.DRAW_EMPTY_AS_OVERWRITE)
+
         self.regions = {key: []}
         for hint in self.hints:
             for region in hint.places:
                 self.regions[key].append(region)
-        self.highlight_regions(key, style)
-
-    def highlight_regions(self, name, style):
-        self.view.add_regions(name,
-                              self.regions[name],
-                              style,
-                              "bookmark",
-                              sublime.DRAW_OUTLINED | sublime.DRAW_EMPTY_AS_OVERWRITE)
+        highlight_regions(key)
 
     def unhighlight_hints(self, key):
         self.view.erase_regions(key)

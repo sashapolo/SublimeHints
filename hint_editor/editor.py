@@ -90,18 +90,19 @@ class BeginEditHintsCommand(HintsRenderer):
 
 class StopEditHintsCommand(sublime_plugin.TextCommand):
     def run(self, edit):
-        highlighter = HintsHighlighter(self.view)
-        highlighter.unhighlight_hints(BeginEditHintsCommand.get_regions_key())
-        if self.view.id() in displayed_hints:
-            hints_file = displayed_hints[self.view.id()]["file"]
-            hint = displayed_hints[self.view.id()]["hint"]
+        id = self.view.id()
+        if id in displayed_hints:
+            hints_file = displayed_hints[id]["file"]
+            hint = displayed_hints[id]["hint"]
+            parent_view = displayed_hints[id]["parent_view"]
+
             hint.text = self.view.substr(sublime.Region(0, self.view.size()))
-            hints_file.dump_json(displayed_hints[self.view.id()]["parent_view"])
-        self.view.window().run_command('set_layout',
-                                       { "cols":  [0.0, 1.0],
-                                         "rows":  [0.0, 1.0],
-                                         "cells": [[0, 0, 1, 1]]
-                                       })
-        self.view.set_scratch(True)
-        self.view.window().run_command("close_file")
+            hints_file.dump_json(parent_view)
+            self.view.set_scratch(True)
+            self.view.window().run_command("close_file")
+
+            del displayed_hints[id]
+            if not displayed_hints:
+                highlighter = HintsHighlighter(parent_view)
+                highlighter.unhighlight_hints(BeginEditHintsCommand.get_regions_key())
 
