@@ -96,7 +96,7 @@ class SublimeUtilMixin(object):
                 return
             edit = view.begin_edit()
             try:
-                n = view.insert(edit, 0, content)
+                view.insert(edit, 0, content)
             finally:
                 view.end_edit(edit)
         if name:
@@ -172,5 +172,9 @@ class HintsRenderer(SublimeUtilMixin, sublime_plugin.TextCommand):
     def render(self, hints_file):
         raise NotImplementedError('HintsRenderer.render() should not be called directly')
 
-from test import TestPluginCommand
-from viewers.browser import BrowserViewCommand
+# Miscellaneous commands section
+try:
+    from test import TestPluginCommand
+    from viewers.browser import BrowserViewCommand
+except ImportError as e:
+    logger.error("Package or module can't be imported (%s)", e.message)

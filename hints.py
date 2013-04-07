@@ -23,7 +23,7 @@ class Hint(object):
     def from_json(cls, view, json_obj):
         def list_to_region(lst):
             begin_line = view.line(view.text_point(lst[0], 0))
-            if lst[1] > begin_line.size():  
+            if lst[1] > begin_line.size():
                 lst[1] = begin_line.size()
             end_line = view.line(view.text_point(lst[2], 0))
             if lst[3] > end_line.size():
