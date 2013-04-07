@@ -11,8 +11,8 @@
 			"text": "Dead parrot"
 		},
 		{
-			"places": [[3, 12, 3, 80], [4, 12, 3, 80]],
-			"text": "Foo bar baz Foo bar baz Foo bar baz Foo bar baz Foo bar baz Foo bar baz Foo bar baz Foo bar baz"
+			"places": [[3, 12, 3, 80], [4, 12, 7, 80]],
+			"text": "Foo bar baz Foo bar baz Foo bar baz Foo bar baz Foo bar baz Foo bar baz Foo bar baz Foo bar baz Foo bar baz Foo bar baz Foo bar baz"
 		} 
 	]
 }

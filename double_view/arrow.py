@@ -76,7 +76,10 @@ class SimpleRouter(object):
             routing = SimpleRouter.RoutingInfo(arrow)
             routing.same_line_number = groups_size[curpos] 
             routings.append(routing)
-        maxcount = max(groups_size, key = lambda x: groups_size[x])
+        maxcount = max(groups_size.values())
+        
+        print groups_size
+        print maxcount
         
         for routing in routings:
             size = groups_size[routing.arrow.start[0]]
@@ -103,7 +106,7 @@ class SimpleRouter(object):
             routing.group_number = i
             routing.parallel_number = groups_size[i]
             routings.append(routing)            
-        maxcount = max(groups_size, key = lambda x: groups_size[x])
+        maxcount = max(groups_size.values())
 
         for routing in routings:
             size = groups_size[routing.group_number]
@@ -139,7 +142,7 @@ class SimpleDrawer(object):
         return string_module.join(self.content, "\n")
 
     def __draw_arrow__(self, arrow):
-        #print arrow.start, arrow.end, arrow.vertical
+        print arrow.start, arrow.end, arrow.vertical
         hshift = arrow.start[1]
         vshift = arrow.start[0]
         hsize = arrow.end[1] - arrow.start[1] + 1

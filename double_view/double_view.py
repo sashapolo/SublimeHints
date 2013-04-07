@@ -24,6 +24,7 @@ class DoubleViewHintsCommand(SublimeHints.HintsRenderer, SublimeHints.SublimeUti
         new_file = self.view.window().new_file()
         new_file.set_scratch(True)
         new_file.settings().set('word_wrap', False)
+        new_file.settings().set('margin', 0)
         new_file.window().run_command("move_to_group", { "group": 1 } )
         return new_file
 
