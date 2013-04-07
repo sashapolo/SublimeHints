@@ -175,6 +175,12 @@ class HintsRenderer(SublimeUtilMixin, sublime_plugin.TextCommand):
 # Miscellaneous commands section
 try:
     from test import TestPluginCommand
+except ImportError:
+    logger.exception("Possibly missing dependency in 'test'")
+try:
     from viewers.browser import BrowserViewCommand
 except ImportError as e:
-    logger.error("Package or module can't be imported (%s)", e.message)
+    logger.exception("Possibly missing dependency in 'viewers.browser'")
+
+from double_view import *
+from hint_editor import *
