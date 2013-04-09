@@ -2,10 +2,10 @@
 
 import tempfile
 import webbrowser
-import os
 import logging
 
-from SublimeHints import HintsRenderer, SublimeUtilMixin, LIB_DIRECTORY
+import os
+from SublimeHints import HintsRenderer, LIB_DIRECTORY
 from jinja2 import Environment, FileSystemLoader, escape, Markup, contextfilter
 
 
@@ -14,8 +14,11 @@ logger.setLevel(logging.DEBUG)
 
 PACKAGE_DIRECTORY = os.path.dirname(__file__)
 env = Environment(loader=FileSystemLoader(os.path.join(PACKAGE_DIRECTORY, 'templates')))
-env.globals['static_files_location'] = os.path.join(PACKAGE_DIRECTORY, 'static')
-env.globals['highlightjs_location'] = os.path.join(LIB_DIRECTORY, 'highlight.js')
+env.globals.update({
+    'LIB_DIRECTORY': LIB_DIRECTORY,
+    'STATIC_FILES_DIRECTORY': os.path.join(PACKAGE_DIRECTORY, 'static'),
+})
+
 
 @contextfilter
 def inject_hints(context, code):
@@ -24,11 +27,14 @@ def inject_hints(context, code):
     regions. It also escapes code fragment and wrap it in Markup object
     to prevent possible double escaping in template.
     """
+
     def region_to_pair(region):
-        return (region.begin(), region.end())
+        return region.begin(), region.end()
+
     if 'hints' not in context:
         return escape(code)
     hints = context['hints']
+    # set literal cant'be used because it isn't available under python2.6 in sublime
     bounds = set([0, len(code)])
     for hint in hints:
         hint.places = map(region_to_pair, hint.places)
@@ -52,6 +58,7 @@ def inject_hints(context, code):
     if context.eval_ctx.autoescape:
         return Markup(preprocessed)
     return preprocessed
+
 
 env.filters['inject_hints'] = inject_hints
 
