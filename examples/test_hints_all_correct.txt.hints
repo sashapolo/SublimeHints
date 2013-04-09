@@ -4,13 +4,9 @@
     "author" : "Skotnikov",
     "createdWith" : "",
     "sourceFileHash" : "",
-    "tags" : [
-        "tag1",
-        "tag2"
-    ],
     "hints": [
     {
-        "text": "This is hint text No.1. It's got two regions",
+        "text": "This is ðints example file , where everything is correct",
         "places": [ [0, 0, 3, 80], [5, 10, 9, 30] ]
     },
     {

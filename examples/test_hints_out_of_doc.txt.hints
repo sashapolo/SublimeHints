@@ -4,13 +4,9 @@
     "author" : "Skotnikov",
     "createdWith" : "",
     "sourceFileHash" : "",
-    "tags" : [
-        "tag1",
-        "tag2"
-    ],
     "hints": [
 	{
-        "text": "Hint No1 - out of document range",
+        "text": "Hint No1 - out of document range. Error - out of document",
         "places": [ [80, 0, 85, 100] ]
     }
 ]

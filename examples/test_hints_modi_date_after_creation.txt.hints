@@ -4,12 +4,9 @@
     "author" : "Skotnikov",
     "createdWith" : "",
     "sourceFileHash" : "",
-    "tags" : [
-        "tag1"
-    ],
     "hints": [
     {
-        "text": "This is hint text No.1. It's got two regions",
+        "text": "Error - wrong modify date example",
         "places": [ [0, 0, 3, 80], [5, 10, 9, 30] ]
     }
 ]
