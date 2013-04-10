@@ -7,14 +7,17 @@
     <link rel="stylesheet" type="text/css" href="{{ STATIC_FILES_DIRECTORY }}/reset.css"/>
     <link rel="stylesheet" type="text/css" href="{{ STATIC_FILES_DIRECTORY }}/layout.css"/>
 
+    {# color scheme to be used #}
+    {% set color_scheme = 'monokai' %}
+
     {# local sources #}
-    <link rel="stylesheet" href="{{ LIB_DIRECTORY }}/highlight.js/styles/monokai.css"/>
+    <link rel="stylesheet" href="{{ LIB_DIRECTORY }}/highlight.js/styles/{{ color_scheme }}.css"/>
     <script src="{{ LIB_DIRECTORY }}/highlight.js/highlight.pack.js"></script>
     <script src="{{ LIB_DIRECTORY }}/jquery-1.9.1.js"></script>
 
     {# external sources #}
     {# from Yandex CDN: this version of highlight.js doesn't contain all supported schemes #}
-    <link rel="stylesheet" href="http://yandex.st/highlightjs/7.3/styles/monokai.min.css"/>
+    <link rel="stylesheet" href="http://yandex.st/highlightjs/7.3/styles/{{ color_scheme }}.min.css"/>
     <script src="http://yandex.st/highlightjs/7.3/highlight.min.js"></script>
     <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
 
