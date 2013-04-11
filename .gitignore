@@ -56,3 +56,9 @@ jinja2
 
 # KDE Dolphin
 .directory
+
+# virtualenv environment
+/env/
+
+# Sphinx documentation generation output
+/sphinx-doc/_build/
