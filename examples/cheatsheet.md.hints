@@ -1,18 +1,54 @@
 {
-	"created": "2013-02-18:00:00:00",
-	"author": "east825",
-	"hints": [
-		{
-			"text": "Ham! Spam! Spam! Spam! Eggs! Sausages!",
-			"places": [[0, 0, 0, 10], [10, 2, 20, 42]]
-		},
-		{
-			"places": [[3, 12, 3, 80]],
-			"text": "Dead parrot"
-		},
-		{
-			"places": [[3, 12, 3, 80], [4, 12, 7, 80]],
-			"text": "Foo bar baz Foo bar baz Foo bar baz Foo bar baz Foo bar baz Foo bar baz Foo bar baz Foo bar baz Foo bar baz Foo bar baz Foo bar baz"
-		} 
-	]
+    "updated": "2013-04-13:15:40:23", 
+    "author": "east825", 
+    "created": "2013-02-18:00:00:00", 
+    "md5sum": "fcf57e210ac7b37437d7da40dc3e741e", 
+    "file": null, 
+    "hints": [
+        {
+            "text": "Ham! Spam! Spam! Spam! Eggs! Sausages!", 
+            "places": [
+                [
+                    0, 
+                    0, 
+                    0, 
+                    9
+                ], 
+                [
+                    10, 
+                    2, 
+                    20, 
+                    42
+                ]
+            ]
+        }, 
+        {
+            "text": "Dead parrot", 
+            "places": [
+                [
+                    3, 
+                    12, 
+                    3, 
+                    56
+                ]
+            ]
+        }, 
+        {
+            "text": "fuck", 
+            "places": [
+                [
+                    3, 
+                    12, 
+                    3, 
+                    56
+                ], 
+                [
+                    4, 
+                    12, 
+                    7, 
+                    25
+                ]
+            ]
+        }
+    ]
 }

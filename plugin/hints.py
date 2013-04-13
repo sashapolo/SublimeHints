@@ -6,6 +6,7 @@ from datetime import datetime
 import functools
 import hashlib
 import copy
+import os
 import sublime
 
 ISO8601_DATE_FORMAT = '%Y-%m-%d:%H:%M:%S'
@@ -16,6 +17,10 @@ class HintFormatError(Exception):
 
 
 class HintsFileNotFoundError(Exception):
+    pass
+
+
+class SourceFileNotFoundError(Exception):
     pass
 
 
@@ -81,14 +86,12 @@ class Meta(object):
                     raise HintFormatError('Illegal time format: %s' % timestamp)
         return cls(**json_obj)
 
-    def to_json(self):
-        self.updated = datetime.now()
-        self.md5sum = 0
+    def to_json(self, file_name):
+        self.md5sum = hashlib.md5(open(file_name, 'rb').read()).hexdigest()
+        self.updated = datetime.fromtimestamp(os.path.getmtime(file_name))
         result = copy.deepcopy(self.__dict__)
         result["created"] = self.created.strftime(ISO8601_DATE_FORMAT)
         result["updated"] = self.updated.strftime(ISO8601_DATE_FORMAT)
-        self.md5sum = hashlib.md5(json.dumps(result, sort_keys = True)).hexdigest()
-        result["md5sum"] = self.md5sum
         return result
 
     def __str__(self):
@@ -114,7 +117,10 @@ class HintFile(object):
 
     def dump_json(self, view):
         with open(self.name, 'w') as hints_file:
-            json_obj = self.meta.to_json()
+            source_file_name = os.path.splitext(self.name)[0]
+            if not os.path.exists(source_file_name):
+                raise SourceFileNotFoundError("File %s not found" % source_file_name)
+            json_obj = self.meta.to_json(source_file_name)
             json_obj["hints"] = []
             for hint in self.hints:
                 json_obj["hints"].append(hint.to_json(view))
