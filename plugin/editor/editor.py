@@ -74,6 +74,8 @@ class BeginEditHintsCommand(HintsRenderer):
                     for hint_region in hint.places:
                         if hint_region.intersects(region):
                             hint_view = self.create_hint_view()
+                            hint_view.set_scratch(True)
+                            hint_view.set_scratch(False)
                             hint_counter += 1
                             hint_view.set_name("Hint " + str(hint_counter))
                             print_hint(hint_view, hint)

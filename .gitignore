@@ -62,3 +62,6 @@ jinja2
 
 # Sphinx documentation generation output
 /sphinx-doc/_build/
+
+# Sublime Rope plugin
+.ropeproject/

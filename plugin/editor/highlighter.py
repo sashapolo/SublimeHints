@@ -6,13 +6,14 @@ Created on Apr 1, 2013
 
 import sublime
 
+
 class HintsHighlighter(object):
     def __init__(self, view, hints = None):
         self.view = view
         self.hints = hints
 
     def highlight_hints(self, key, style):
-        assert (self.hints != None)
+        assert (self.hints is not None)
 
         def highlight_regions(name):
             self.view.add_regions(name,

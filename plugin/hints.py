@@ -66,19 +66,28 @@ class Hint(object):
 
 class Meta(object):
 
-    def __init__(self, created = None, updated = None, author = 'unknown', md5sum = None, file = None, **kwargs):
+    def __init__(self,
+                 created = None,
+                 modified = None,
+                 author = 'unknown',
+                 createdWith = 'unknown',
+                 createdTimestamp = None,
+                 modifiedTimestamp = None,
+                 md5sum = None,
+                 **kwargs):
         self.created = created
-        self.updated = updated
+        self.modified = modified
         self.author = author
         self.md5sum = md5sum
-        self.file = file
+        self.createdTimestamp = createdTimestamp
+        self.modifiedTimestamp = modifiedTimestamp
         # if kwargs:
         #     raise HintFormatError('Unknown fields: %s' % kwargs)
         self.__dict__.update(kwargs)
 
     @classmethod
     def from_json(cls, json_obj):
-        for timestamp in ('created', 'updated'):
+        for timestamp in ('created', 'updated', 'createdTimestamp', 'modifiedTimestamp'):
             if timestamp in json_obj:
                 try:
                     json_obj[timestamp] = datetime.strptime(json_obj[timestamp], ISO8601_DATE_FORMAT)
@@ -87,11 +96,15 @@ class Meta(object):
         return cls(**json_obj)
 
     def to_json(self, file_name):
-        self.md5sum = hashlib.md5(open(file_name, 'rb').read()).hexdigest()
-        self.updated = datetime.fromtimestamp(os.path.getmtime(file_name))
-        result = copy.deepcopy(self.__dict__)
-        result["created"] = self.created.strftime(ISO8601_DATE_FORMAT)
-        result["updated"] = self.updated.strftime(ISO8601_DATE_FORMAT)
+        result = copy.deepcopy(dict((k, v) for k, v in self.__dict__.items() if v is not None))
+        if self.created:
+            result["created"] = self.created.strftime(ISO8601_DATE_FORMAT)
+        if self.modified:
+            result["modified"] = self.modified.strftime(ISO8601_DATE_FORMAT)
+        if self.createdTimestamp:
+            result["createdTimestamp"] = self.createdTimestamp.strftime(ISO8601_DATE_FORMAT)
+        if self.modifiedTimestamp:
+            result["modifiedTimestamp"] = self.modifiedTimestamp.strftime(ISO8601_DATE_FORMAT)
         return result
 
     def __str__(self):
