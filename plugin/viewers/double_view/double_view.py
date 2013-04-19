@@ -40,9 +40,7 @@ class DoubleViewHintsCommand(SublimeHints.HintsRenderer, SublimeHints.SublimeUti
 
     def __setup_views__(self):
         self.hint_view.view.set_read_only(True)
-        self.synchro = synchro.Synchronizer()
-        self.synchro.add_view(self.text_view)
-        self.synchro.add_view(self.hint_view.view)
+        self.synchro = synchro.Synchronizer(self.text_view, self.hint_view.view)
         self.synchro.run()
         self.view.window().focus_view(self.view)
 
