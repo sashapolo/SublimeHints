@@ -1,0 +1,18 @@
+{
+    "created": "2013-07-21:03:00:00",
+    "author": "east825",
+    "hints": [
+        {
+            "places": [[14, 8, 14, 50], [19, 8, 19, 71], [36, 8, 36, 66]],
+            "text": "error() rules!"
+        },
+        {
+            "text": "Forgot to check possible fgets() error",
+            "places": [[44, 4, 44, 25]]
+        },
+        {
+            "text": "Actually I could use %# specifier here, but strangely it prints just '0' for zero (not 0x00)",
+            "places": [[52, 20, 52, 26]]
+        }
+    ]
+}

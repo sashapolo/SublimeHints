@@ -1,0 +1,78 @@
+div {
+    display: block;
+    border-width: 0;
+}
+
+html, body {
+    /*height: 100%;*/
+}
+
+pre>code {
+    font-family: monospace;
+    overflow: scroll;
+}
+
+#container {
+    margin: 0 auto;
+    width: 960px;
+    /*height: 100%;*/
+}
+
+#header {
+    height: 40px;
+    background: rgb(54, 53, 54);
+    padding: 1em;
+}
+
+#header h1 {
+    font-size: 2em;
+    color: aliceblue;
+}
+
+#column-wrap {
+    overflow: hidden;
+    background: rgb(80, 79, 80);
+    height: 100%;
+    /*display: block;*/
+    padding-bottom: 10px;
+    padding-left: 10px;
+}
+
+#code-pane {
+    float: left;
+    width: 70%;
+    height: 100%;
+    /*padding: 0.5em;*/
+    background: rgb(119, 119, 119);
+}
+
+#code-pane>* {
+    margin: 10px;
+}
+
+#hints-pane {
+    float: left;
+    width: 30%;
+}
+
+#hints-pane>* {
+    margin: 10px;
+}
+
+.hint>.from, .hint>.to {
+    display: none;
+}
+
+.hint .content {
+    background: #dee882;
+    padding: 0.5em;
+}
+
+/*Selected code region*/
+span.highlighted {
+    background: #2bbcbf;
+}
+/*Selected hint input hints panel*/
+div.hint.highlighted {
+    font-weight: bold;
+}

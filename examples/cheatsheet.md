@@ -1,4 +1,4 @@
-HOTKEYS
+`HOTKEYS`
 =======
 
 - alt+left/right - move to word boundaries in camel case
@@ -42,7 +42,7 @@ Marks
 
 - ctrl+k, ctrl+space - add mark
 - ctrl+k, ctrl+g - clear mark
-- 
+-
 
 
 

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_FILES_DIRECTORY }}/reset.css"/>
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_FILES_DIRECTORY }}/layout.css"/>
+
+    {# color scheme to be used #}
+    {% set color_scheme = 'monokai' %}
+
+    {# local sources #}
+    <link rel="stylesheet" href="{{ LIB_DIRECTORY }}/highlight.js/styles/{{ color_scheme }}.css"/>
+    <script src="{{ LIB_DIRECTORY }}/highlight.js/highlight.pack.js"></script>
+    <script src="{{ LIB_DIRECTORY }}/jquery-1.9.1.js"></script>
+
+    {# external sources #}
+    {# from Yandex CDN: this version of highlight.js doesn't contain all supported schemes #}
+    <link rel="stylesheet" href="http://yandex.st/highlightjs/7.3/styles/{{ color_scheme }}.min.css"/>
+    <script src="http://yandex.st/highlightjs/7.3/highlight.min.js"></script>
+    <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+                    // turn on hints highlighting
+                    $('.hint').each(function () {
+                        $(this).hover(function() {
+                            $(this).toggleClass('highlighted')
+                        });
+                        var hintID = $(this).attr('class').split(' ')[1];
+                        $(this).find('p').hover(function () {
+                            $('span.' + hintID).toggleClass('highlighted');
+                        })
+                    })
+                    // then code highlighting
+                    $("pre code").each(function (i, e) {
+                        hljs.highlightBlock(e)
+                    });
+                }
+        )
+    </script>
+    <title> {{ title }} </title>
+</head>
+<body>
+<div id="container">
+    <div id="header">
+        <h1>Hints for {{ title|e }}</h1>
+    </div>
+    <div id="column-wrap">
+        <div id="code-pane">
+            <pre><code class="{{ filetype|d('text') }}">{{ code|inject_hints }}</code></pre>
+        </div>
+        <div id="hints-pane">
+            {% for hint in hints %}
+                <div class="hint hint{{ loop.index0 }}">
+{#                    <div class="from">{{ hint['from'] }}</div>#}
+{#                    <div class="to">{{ hint['to'] }}</div>#}
+                    <div class="content">
+                        <p>{{ hint.text|e }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+
+        </div>
+    </div>
+</div>
+</body>
+</html>

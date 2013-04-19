@@ -1,0 +1,22 @@
+{
+    "author": "snowball",
+    "created": "2013-04-07:00:00:00",
+    "hints": [
+        {
+            "places": [[14, 1, 17, 14]],
+            "text": "Sex and religion are closer to each other than either might prefer"
+        },
+        {
+            "places": [[20, 31, 21, 57], [21, 77, 22, 102]],
+            "text": "C makes it easy to shoot yourself in the foot; C++ makes it harder, but when you do, it blows away your whole leg"
+        },
+        {
+            "places": [[42, 1, 48, 2]],
+            "text": "Against stupidity, the gods themselves contend in vain"
+        },
+        {
+            "places": [[54, 1, 60, 0]],
+            "text": "This picture looks like shit!"
+        }
+    ]
+}
