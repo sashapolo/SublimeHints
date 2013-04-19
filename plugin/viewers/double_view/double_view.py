@@ -7,21 +7,55 @@ import arrow
 import string
 
 class DoubleViewHintsCommand(SublimeHints.HintsRenderer, SublimeHints.SublimeUtilMixin):
+    
+    __activated = {}
+
     def render(self, hints_file):
+        id = self.view.id()
+        print DoubleViewHintsCommand.__activated.keys(), id
+        if id in DoubleViewHintsCommand.__activated:
+            self.__deactivate(*DoubleViewHintsCommand.__activated[id])
+            del DoubleViewHintsCommand.__activated[id]
+        else:
+            self.__activate(hints_file)
+
+    def __deactivate(self, target_file, hint_file, synchronizer):
+        if hint_file.window() != None:
+            hint_file.window().focus_view(hint_file)
+            hint_file.window().run_command("close_file")
+        target_file.erase_regions("text_highlight")
+        if len(DoubleViewHintsCommand.__activated) == 1:
+            target_file.window().run_command("set_layout", \
+                                        {"cols": [0.0, 1.0], \
+                                        "rows": [0.0, 1.0], \
+                                        "cells": [[0, 0, 1, 1]]})
+        synchronizer.remove_view(target_file)
+        synchronizer.remove_view(hint_file)
+        target_file.window().focus_view(target_file)
+
+
+    def __activate(self, hints_file):
         self.hints_file = hints_file
         self.separator = 0.7
         self.text_view = self.view
         self.hint_view = self.__create_double_view__(self.separator)
         self.hint_view_width = self.__calculate_width__(self.hint_view)
         self.hint_view_height = self.__calculate_height__()
-        self.hint_view = HintView(self.hint_view, hints_file.hints, self.text_view, self.hint_view_height, width = self.hint_view_width)
+        self.hint_view = HintView(self.hint_view, hints_file.hints, \
+                                self.text_view, self.hint_view_height, \
+                                width = self.hint_view_width)
         self.__highlight_text__()
         self.__setup_views__()
+        self.__add_activated()
 
     def __create_double_view__(self, separator):
         self.view.settings().set('word_wrap', False)
-        self.view.window().run_command("set_layout", {"cols": [0.0, separator, 1.0], "rows": [0.0, 1.0], "cells": [[0, 0, 1, 1], [1, 0, 2, 1]]})
+        self.view.window().run_command("set_layout", \
+                                        {"cols": [0.0, separator, 1.0], \
+                                        "rows": [0.0, 1.0], \
+                                        "cells": [[0, 0, 1, 1], [1, 0, 2, 1]]})
         new_file = self.view.window().new_file()
+        new_file.set_name("Hints");
         new_file.set_scratch(True)
         new_file.settings().set('word_wrap', False)
         new_file.settings().set('margin', 0)
@@ -36,13 +70,19 @@ class DoubleViewHintsCommand(SublimeHints.HintsRenderer, SublimeHints.SublimeUti
         return self.file_content().count("\n")
       
     def __highlight_text__(self):
-        self.text_view.add_regions("text_highlight", map(lambda x: x.text_place, self.hint_view.get_hints()), "comment", "bookmark")  
+        self.text_view.add_regions("text_highlight", \
+                map(lambda x: x.text_place, self.hint_view.get_hints()), "comment", "bookmark")  
 
     def __setup_views__(self):
         self.hint_view.view.set_read_only(True)
         self.synchro = synchro.Synchronizer(self.text_view, self.hint_view.view)
         self.synchro.run()
         self.view.window().focus_view(self.view)
+
+    def __add_activated(self):
+        key = self.text_view.id()
+        DoubleViewHintsCommand.__activated[key] = (self.text_view, self.hint_view.view, self.synchro)
+
 
 
 
@@ -54,6 +94,7 @@ class HintRepr(object):
         self.formatted = None
         self.width = width
         self.height = None
+        self.format_hint()
 
     def format_hint(self, number = None):
         if number == None:

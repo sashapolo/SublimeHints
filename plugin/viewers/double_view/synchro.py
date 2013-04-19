@@ -23,6 +23,8 @@ class Synchronizer(object):
             if view.id() == add_view.id():
                 return
         self.views.append(add_view)
+        sublime.set_timeout(self.run, self.timeout)
+
     def remove_view(self, remove_view):
         id = remove_view.id()
         for view in self.views:
@@ -43,10 +45,11 @@ class Synchronizer(object):
         return other_views
 
     def run(self):
+        if len(self.views) == 0:
+            return
         for view in self.views:
             if view.viewport_position() != self.last_viewport:
                 new_viewport = view.viewport_position()
-                print new_viewport, self.last_viewport
                 for other_view in self.get_other_views(view):
                     other_view.set_viewport_position(new_viewport, True)
                 self.last_viewport = new_viewport
