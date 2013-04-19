@@ -182,5 +182,5 @@ try:
 except ImportError as e:
     logger.exception("Possibly missing dependency in 'viewers.browser'")
 
-from double_view import *
+from viewers.double_view import *
 from hint_editor import *
