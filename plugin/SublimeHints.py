@@ -27,6 +27,7 @@ console_handler.setLevel(logging.DEBUG)
 console_handler.setFormatter(logging.Formatter('[%(levelname)s]:%(name)s: %(message)s'))
 logger.addHandler(console_handler)
 logger.propagate = False
+#logging.disable(logging.CRITICAL)
 
 
 class SublimeUtilMixin(object):
@@ -182,5 +183,6 @@ try:
 except ImportError as e:
     logger.exception("Possibly missing dependency in 'viewers.browser'")
 
-from viewers.double_view import *
+from viewers.double_view import DoubleViewHintsCommand
+from viewers.double_view import SelectionListener
 from hint_editor import *

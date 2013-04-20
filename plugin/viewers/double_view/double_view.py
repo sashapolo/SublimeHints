@@ -8,27 +8,35 @@ import string
 
 class DoubleViewHintsCommand(SublimeHints.HintsRenderer, SublimeHints.SublimeUtilMixin):
     
-    __activated = {}
+    activated = {}
+    activate_listener = False
 
     def render(self, hints_file):
         id = self.view.id()
-        print DoubleViewHintsCommand.__activated.keys(), id
-        if id in DoubleViewHintsCommand.__activated:
-            self.__deactivate(*DoubleViewHintsCommand.__activated[id])
-            del DoubleViewHintsCommand.__activated[id]
+        #print id
+        for key in DoubleViewHintsCommand.activated:
+            if id in key:
+                self.__deactivate(DoubleViewHintsCommand.activated[key])
+                del DoubleViewHintsCommand.activated[key]
+                break
         else:
             self.__activate(hints_file)
 
-    def __deactivate(self, target_file, hint_file, synchronizer):
-        if hint_file.window() != None:
-            hint_file.window().focus_view(hint_file)
-            hint_file.window().run_command("close_file")
+    def __deactivate(self, command):
+        target_file = command.text_view
+        hint_file = command.hint_view.view
+        synchronizer = command.synchro
+        views_id = map(lambda x: x.id(), target_file.window().views())
+        if hint_file.id() in views_id:
+            target_file.window().focus_view(hint_file)
+            target_file.window().run_command("close_file")
         target_file.erase_regions("text_highlight")
-        if len(DoubleViewHintsCommand.__activated) == 1:
+        if len(DoubleViewHintsCommand.activated) == 1:
             target_file.window().run_command("set_layout", \
                                         {"cols": [0.0, 1.0], \
                                         "rows": [0.0, 1.0], \
                                         "cells": [[0, 0, 1, 1]]})
+            DoubleViewHintsCommand.activate_listener = False
         synchronizer.remove_view(target_file)
         synchronizer.remove_view(hint_file)
         target_file.window().focus_view(target_file)
@@ -44,7 +52,7 @@ class DoubleViewHintsCommand(SublimeHints.HintsRenderer, SublimeHints.SublimeUti
         self.hint_view = HintView(self.hint_view, hints_file.hints, \
                                 self.text_view, self.hint_view_height, \
                                 width = self.hint_view_width)
-        self.__highlight_text__()
+        #self.__highlight_text__()
         self.__setup_views__()
         self.__add_activated()
 
@@ -80,8 +88,10 @@ class DoubleViewHintsCommand(SublimeHints.HintsRenderer, SublimeHints.SublimeUti
         self.view.window().focus_view(self.view)
 
     def __add_activated(self):
-        key = self.text_view.id()
-        DoubleViewHintsCommand.__activated[key] = (self.text_view, self.hint_view.view, self.synchro)
+        key = (self.text_view.id(), self.hint_view.view.id())
+        DoubleViewHintsCommand.activated[key] = self
+        DoubleViewHintsCommand.activate_listener = True
+        #print DoubleViewHintsCommand.activated.keys()
 
 
 
@@ -94,6 +104,7 @@ class HintRepr(object):
         self.formatted = None
         self.width = width
         self.height = None
+        self.begin_line = None
         self.format_hint()
 
     def format_hint(self, number = None):
@@ -129,10 +140,12 @@ class HintPanel(object):
             begin, _ = text_view.rowcol(hint.text_place.begin())
             if current >= begin:
                 self.arrows.append(arrow.Arrow(begin, current))
+                hint.begin_line = current
                 content += formatted
                 current += height
             else:
                 self.arrows.append(arrow.Arrow(begin, begin))
+                hint.begin_line = begin
                 content += "\n" * (begin - current)
                 content += formatted
                 current = begin + height 
@@ -154,6 +167,7 @@ class HintView(object):
         self.height = height
         self.hint_panel = HintPanel(hints, text_view, width)
         self.arrow_panel = arrow.ArrowPanel(self.hint_panel.get_arrows(), self.hint_panel.content_height())
+        self.hints = self.hint_panel.hints_repr
         self.content = self.__form_content__()
         edit = self.view.begin_edit()
         try:
