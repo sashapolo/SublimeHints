@@ -6,7 +6,7 @@ Created on Mar 17, 2013
 
 from SublimeHints import HintsRenderer
 from highlighter import HintsHighlighter
-from hints import Meta, HintFile
+from hints import Meta, HintFile, Hint
 import sublime_plugin
 import sublime
 import os
@@ -59,8 +59,6 @@ class BeginEditHintsCommand(HintsRenderer):
                     for hint_region in hint.places:
                         if hint_region.intersects(region):
                             hint_view = self.create_hint_view()
-                            hint_view.set_scratch(True)
-                            hint_view.set_scratch(False)
                             hint_counter += 1
                             hint_view.set_name("Hint " + str(hint_counter))
                             print_hint(hint_view, hint)
@@ -103,14 +101,26 @@ class CreateNewHintsFileCommand(sublime_plugin.TextCommand):
         self.view.window().show_input_panel("Author:", "", self.on_done, None, None)
 
     def on_done(self, user_input):
-        with open(self.hints_file_name, "w"):
-            source_file_name = self.view.file_name()
-            meta = Meta(created = datetime.fromtimestamp(os.path.getctime(self.hints_file_name)),
-                        modified = datetime.fromtimestamp(os.path.getmtime(self.hints_file_name)),
-                        author = user_input,
-                        createdWith = "SublimeHints editor v0.1",
-                        createdTimestamp = datetime.fromtimestamp(os.path.getctime(source_file_name)),
-                        modifiedTimestamp = datetime.fromtimestamp(os.path.getmtime(source_file_name)),
-                        md5sum = hashlib.md5(open(source_file_name, 'rb').read()).hexdigest())
-            hint_file = HintFile(meta, [], self.hints_file_name)
-            hint_file.dump_json(self.view)
+        source_file_name = self.view.file_name()
+        meta = Meta(created = datetime.fromtimestamp(datetime.now()),
+                    modified = datetime.fromtimestamp(datetime.now()),
+                    author = user_input,
+                    createdWith = "SublimeHints editor v0.1",
+                    createdTimestamp = datetime.fromtimestamp(os.path.getctime(source_file_name)),
+                    modifiedTimestamp = datetime.fromtimestamp(os.path.getmtime(source_file_name)),
+                    md5sum = hashlib.md5(open(source_file_name, 'rb').read()).hexdigest())
+        hint_file = HintFile(meta, [], self.hints_file_name)
+        hint_file.dump_json(self.view)
+
+
+class AppendHintCommand(HintsRenderer):
+    def render(self, hints_file):
+        self.hints_file = hints_file
+        self.view.window().show_input_panel("Hint text:", "", self.on_done, None, None)
+
+    def on_done(self, user_input):
+        hint = Hint(user_input)
+        for region in self.view.sel():
+            hint.places.append(region)
+        self.hints_file.hints.append(hint)
+        self.hints_file.dump_json(self.view)

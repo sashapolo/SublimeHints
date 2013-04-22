@@ -25,9 +25,10 @@ class SourceFileNotFoundError(Exception):
 
 
 class Hint(object):
-    def __init__(self, text, places):
+    def __init__(self, text, places = [], tags = []):
         self.text = text
         self.places = places
+        self.tags = tags
 
     @classmethod
     def from_json(cls, view, json_obj):
@@ -133,6 +134,7 @@ class HintFile(object):
             source_file_name = os.path.splitext(self.name)[0]
             if not os.path.exists(source_file_name):
                 raise SourceFileNotFoundError("File %s not found" % source_file_name)
+            self.meta.modified = datetime.fromtimestamp(os.path.getmtime(self.name))
             json_obj = self.meta.to_json(source_file_name)
             json_obj["hints"] = []
             for hint in self.hints:
