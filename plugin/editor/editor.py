@@ -6,8 +6,12 @@ Created on Mar 17, 2013
 
 from SublimeHints import HintsRenderer
 from highlighter import HintsHighlighter
+from hints import Meta, HintFile
 import sublime_plugin
 import sublime
+import os
+from datetime import datetime
+import hashlib
 
 
 displayed_hints = {}
@@ -109,9 +113,23 @@ class StopEditHintsCommand(sublime_plugin.TextCommand):
                 highlighter.unhighlight_hints(BeginEditHintsCommand.get_regions_key())
 
 
-# class CreateNewHintsFileCommand(sublime_plugin.TextCommand):
-#     def run(self, edit):
-#         self.view.window().show_input_panel("Say something:", 'something', self.on_done, None, None)
-#
-#     def on_done(self, user_input):
-#         sublime.status_message("User said: " + user_input)
+class CreateNewHintsFileCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        self.hints_file_name = self.view.file_name() + ".hints"
+        if os.path.exists(self.hints_file_name):
+            sublime.status_message("Error: file %s already exists" % self.hints_file_name)
+            return
+        self.view.window().show_input_panel("Author:", "", self.on_done, None, None)
+
+    def on_done(self, user_input):
+        with open(self.hints_file_name, "w"):
+            source_file_name = os.path.splitext(self.hints_file_name)[0]
+            meta = Meta(created = datetime.fromtimestamp(os.path.getctime(self.hints_file_name)),
+                        modified = datetime.fromtimestamp(os.path.getmtime(self.hints_file_name)),
+                        author = user_input,
+                        createdWith = "SublimeHints editor v0.1",
+                        createdTimestamp = datetime.fromtimestamp(os.path.getctime(source_file_name)),
+                        modifiedTimestamp = datetime.fromtimestamp(os.path.getmtime(source_file_name)),
+                        md5sum = hashlib.md5(open(source_file_name, 'rb').read()).hexdigest())
+            hint_file = HintFile(meta, [], self.hints_file_name)
+            hint_file.dump_json(self.view)
