@@ -17,25 +17,6 @@ import hashlib
 displayed_hints = {}
 
 
-class HighlightHintsCommand(HintsRenderer):
-    _regions_key = "highlighter"
-    _highlighted_views = {}
-
-    @classmethod
-    def get_regions_key(cls):
-        return cls._regions_key
-
-    def render(self, hints_file):
-        highlighted = self._highlighted_views.setdefault(self.view.id(), False)
-        highlighter = HintsHighlighter(self.view, hints_file.hints)
-        if not highlighted:
-            highlighter.highlight_hints(self._regions_key, "comment")
-            self._highlighted_views[self.view.id()] = True
-        else:
-            highlighter.unhighlight_hints(self._regions_key)
-            self._highlighted_views[self.view.id()] = False
-
-
 class BeginEditHintsCommand(HintsRenderer):
     _regions_key = "editor"
 
@@ -84,9 +65,9 @@ class BeginEditHintsCommand(HintsRenderer):
                             hint_view.set_name("Hint " + str(hint_counter))
                             print_hint(hint_view, hint)
                             hint_set.add(hint)
-                            displayed_hints[hint_view.id()] = {"file": self.hints_file,
-                                                               "hint": hint,
-                                                               "parent_view": self.view
+                            displayed_hints[hint_view.id()] = { "file": self.hints_file,
+                                                                "hint": hint,
+                                                                "parent_view": self.view
                                                               }
                             break
 
@@ -123,7 +104,7 @@ class CreateNewHintsFileCommand(sublime_plugin.TextCommand):
 
     def on_done(self, user_input):
         with open(self.hints_file_name, "w"):
-            source_file_name = os.path.splitext(self.hints_file_name)[0]
+            source_file_name = self.view.file_name()
             meta = Meta(created = datetime.fromtimestamp(os.path.getctime(self.hints_file_name)),
                         modified = datetime.fromtimestamp(os.path.getmtime(self.hints_file_name)),
                         author = user_input,
