@@ -102,8 +102,8 @@ class CreateNewHintsFileCommand(sublime_plugin.TextCommand):
 
     def on_done(self, user_input):
         source_file_name = self.view.file_name()
-        meta = Meta(created = datetime.fromtimestamp(datetime.now()),
-                    modified = datetime.fromtimestamp(datetime.now()),
+        meta = Meta(created = datetime.now(),
+                    modified = datetime.now(),
                     author = user_input,
                     createdWith = "SublimeHints editor v0.1",
                     createdTimestamp = datetime.fromtimestamp(os.path.getctime(source_file_name)),
