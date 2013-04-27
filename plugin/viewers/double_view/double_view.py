@@ -82,7 +82,6 @@ class DoubleViewHintsCommand(SublimeHints.HintsRenderer, SublimeHints.SublimeUti
                 map(lambda x: x.text_place, self.hint_view.get_hints()), "comment", "bookmark")  
 
     def __setup_views__(self):
-        self.hint_view.view.set_read_only(True)
         self.synchro = synchro.Synchronizer(self.text_view, self.hint_view.view)
         self.synchro.run()
         self.view.window().focus_view(self.view)
@@ -93,6 +92,15 @@ class DoubleViewHintsCommand(SublimeHints.HintsRenderer, SublimeHints.SublimeUti
         DoubleViewHintsCommand.activate_listener = True
         #print DoubleViewHintsCommand.activated.keys()
 
+    def find_hint(self, line):
+        hints = self.hint_view.hints
+        for hint in hints:
+            if (line >= hint.begin_line) \
+                and (line <= (hint.begin_line + hint.height - 1)):
+                return hint
+
+    def reload_hint_file(self):
+        self.hint_view.reload()
 
 
 
@@ -169,11 +177,13 @@ class HintView(object):
         self.arrow_panel = arrow.ArrowPanel(self.hint_panel.get_arrows(), self.hint_panel.content_height())
         self.hints = self.hint_panel.hints_repr
         self.content = self.__form_content__()
+        self.view.set_read_only(False)
         edit = self.view.begin_edit()
         try:
             self.view.insert(edit, 0, self.content)
         finally:
             self.view.end_edit(edit)
+        self.view.set_read_only(True)
 
     def __form_content__(self):
         hint_content = self.hint_panel.get_content().splitlines()
@@ -193,3 +203,6 @@ class HintView(object):
 
     def get_hints(self):
         return self.hint_panel.hints_repr
+
+    def reload(self):
+        

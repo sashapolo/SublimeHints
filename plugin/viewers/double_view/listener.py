@@ -19,7 +19,6 @@ class SelectionListener(sublime_plugin.EventListener):
 
     def __highlight(self, command):
         hint_view = command.hint_view.view
-        hints = command.hint_view.hints
         selected = hint_view.sel()
         lines = []
         for region in selected:
@@ -29,10 +28,9 @@ class SelectionListener(sublime_plugin.EventListener):
 
         command.text_view.erase_regions("text_highlight")
         for line_number in line_numbers:
-            for hint in hints:
-                if (line_number >= hint.begin_line) \
-                    and (line_number <= (hint.begin_line + hint.height - 1)):
-                    self.__highlight_hint(command, hint)
+            hint = command.find_hint(line_number)
+            if hint != None:
+                self.__highlight_hint(command, hint)
 
 
     def __highlight_hint(self, command, hint):
