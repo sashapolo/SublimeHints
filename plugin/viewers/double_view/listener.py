@@ -23,7 +23,7 @@ class SelectionListener(sublime_plugin.EventListener):
         lines = []
         for region in selected:
             lines.extend(hint_view.lines(region))
-        print lines
+        #print lines
         line_numbers = map(lambda x: (hint_view.rowcol(x.begin()))[0], lines)
 
         command.text_view.erase_regions("text_highlight")

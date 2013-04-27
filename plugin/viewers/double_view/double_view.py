@@ -6,7 +6,7 @@ import synchro
 import arrow
 import string
 
-class DoubleViewHintsCommand(SublimeHints.HintsRenderer, SublimeHints.SublimeUtilMixin):
+class DoubleViewHintsCommand(SublimeHints.HintsRenderer):
     
     activated = {}
     activate_listener = False
@@ -100,7 +100,8 @@ class DoubleViewHintsCommand(SublimeHints.HintsRenderer, SublimeHints.SublimeUti
                 return hint
 
     def reload_hint_file(self):
-        self.hint_view.reload()
+        self.hints_file = super(DoubleViewHintsCommand, self).load_file()
+        self.hint_view.reload(self.hints_file.hints)
 
 
 
@@ -172,7 +173,9 @@ class HintPanel(object):
 class HintView(object):
     def __init__(self, view, hints, text_view, height, width = 80):
         self.view = view
+        self.text_view = text_view
         self.height = height
+        self.width = width
         self.hint_panel = HintPanel(hints, text_view, width)
         self.arrow_panel = arrow.ArrowPanel(self.hint_panel.get_arrows(), self.hint_panel.content_height())
         self.hints = self.hint_panel.hints_repr
@@ -180,6 +183,7 @@ class HintView(object):
         self.view.set_read_only(False)
         edit = self.view.begin_edit()
         try:
+            self.view.erase(edit, sublime.Region(0, self.view.size()))
             self.view.insert(edit, 0, self.content)
         finally:
             self.view.end_edit(edit)
@@ -204,5 +208,6 @@ class HintView(object):
     def get_hints(self):
         return self.hint_panel.hints_repr
 
-    def reload(self):
-        
+    def reload(self, hints):
+        self.__init__(self.view, hints, self.text_view, self.height, self.width)
+
