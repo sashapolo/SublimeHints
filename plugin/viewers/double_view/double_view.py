@@ -104,6 +104,24 @@ class DoubleViewHintsCommand(SublimeHints.HintsRenderer):
         self.hint_view.reload(self.hints_file.hints)
 
 
+    @classmethod
+    def find_by_target_view_id(cls, id):
+        for key in cls.activated:
+            if key[0] == id:
+                return cls.activated[key]
+                break
+        else:
+            return None    
+
+    @classmethod
+    def find_by_hint_view_id(cls, id):
+        for key in cls.activated:
+            if key[1] == id:
+                return cls.activated[key]
+                break
+        else:
+            return None
+
 
 class HintRepr(object):
     def __init__(self, hint, number = 0, width = 80):

@@ -9,12 +9,11 @@ class SelectionListener(sublime_plugin.EventListener):
 
         activated = DoubleViewHintsCommand.activated
         id = view.id()
-        for key in activated:
-            if key[1] == id:
-                self.__highlight(activated[key])
-                break
-        else:
+        command = DoubleViewHintsCommand.find_by_hint_view_id(id)
+        if command == None:
             return
+        else:
+            self.__highlight(command)
 
 
     def __highlight(self, command):
