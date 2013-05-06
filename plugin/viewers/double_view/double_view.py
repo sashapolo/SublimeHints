@@ -6,8 +6,9 @@ import synchro
 import arrow
 import string
 
+
 class DoubleViewHintsCommand(SublimeHints.HintsRenderer):
-    
+
     activated = {}
     activate_listener = False
 
@@ -32,15 +33,14 @@ class DoubleViewHintsCommand(SublimeHints.HintsRenderer):
             target_file.window().run_command("close_file")
         target_file.erase_regions("text_highlight")
         if len(DoubleViewHintsCommand.activated) == 1:
-            target_file.window().run_command("set_layout", \
-                                        {"cols": [0.0, 1.0], \
-                                        "rows": [0.0, 1.0], \
-                                        "cells": [[0, 0, 1, 1]]})
+            target_file.window().run_command("set_layout",
+                                            {"cols": [0.0, 1.0],
+                                             "rows": [0.0, 1.0],
+                                             "cells": [[0, 0, 1, 1]]})
             DoubleViewHintsCommand.activate_listener = False
         synchronizer.remove_view(target_file)
         synchronizer.remove_view(hint_file)
         target_file.window().focus_view(target_file)
-
 
     def __activate(self, hints_file):
         self.hints_file = hints_file
@@ -49,25 +49,25 @@ class DoubleViewHintsCommand(SublimeHints.HintsRenderer):
         self.hint_view = self.__create_double_view__(self.separator)
         self.hint_view_width = self.__calculate_width__(self.hint_view)
         self.hint_view_height = self.__calculate_height__()
-        self.hint_view = HintView(self.hint_view, hints_file.hints, \
-                                self.text_view, self.hint_view_height, \
-                                width = self.hint_view_width)
+        self.hint_view = HintView(self.hint_view, hints_file.hints,
+                                  self.text_view, self.hint_view_height,
+                                  width = self.hint_view_width)
         #self.__highlight_text__()
         self.__setup_views__()
         self.__add_activated()
 
     def __create_double_view__(self, separator):
         self.view.settings().set('word_wrap', False)
-        self.view.window().run_command("set_layout", \
-                                        {"cols": [0.0, separator, 1.0], \
-                                        "rows": [0.0, 1.0], \
-                                        "cells": [[0, 0, 1, 1], [1, 0, 2, 1]]})
+        self.view.window().run_command("set_layout",
+                                      {"cols": [0.0, separator, 1.0],
+                                       "rows": [0.0, 1.0],
+                                       "cells": [[0, 0, 1, 1], [1, 0, 2, 1]]})
         new_file = self.view.window().new_file()
-        new_file.set_name("Hints");
+        new_file.set_name("Hints")
         new_file.set_scratch(True)
         new_file.settings().set('word_wrap', False)
         new_file.settings().set('margin', 0)
-        new_file.window().run_command("move_to_group", { "group": 1 } )
+        new_file.window().run_command("move_to_group", { "group": 1 })
         return new_file
 
     def __calculate_width__(self, view):
@@ -76,10 +76,10 @@ class DoubleViewHintsCommand(SublimeHints.HintsRenderer):
 
     def __calculate_height__(self):
         return self.file_content().count("\n")
-      
+
     def __highlight_text__(self):
-        self.text_view.add_regions("text_highlight", \
-                map(lambda x: x.text_place, self.hint_view.get_hints()), "comment", "bookmark")  
+        self.text_view.add_regions("text_highlight",
+                map(lambda x: x.text_place, self.hint_view.get_hints()), "comment", "bookmark")
 
     def __setup_views__(self):
         self.synchro = synchro.Synchronizer(self.text_view, self.hint_view.view)
@@ -93,16 +93,14 @@ class DoubleViewHintsCommand(SublimeHints.HintsRenderer):
         #print DoubleViewHintsCommand.activated.keys()
 
     def find_hint(self, line):
-        hints = self.hint_view.hints
-        for hint in hints:
-            if (line >= hint.begin_line) \
-                and (line <= (hint.begin_line + hint.height - 1)):
+        for hint in self.hint_view.hints:
+            if (line >= hint.begin_line) and \
+               (line <= (hint.begin_line + hint.height - 1)):
                 return hint
 
     def reload_hint_file(self):
         self.hints_file = super(DoubleViewHintsCommand, self).load_file()
         self.hint_view.reload(self.hints_file.hints)
-
 
     @classmethod
     def find_by_target_view_id(cls, id):
@@ -111,7 +109,7 @@ class DoubleViewHintsCommand(SublimeHints.HintsRenderer):
                 return cls.activated[key]
                 break
         else:
-            return None    
+            return None
 
     @classmethod
     def find_by_hint_view_id(cls, id):
@@ -135,7 +133,7 @@ class HintRepr(object):
         self.format_hint()
 
     def format_hint(self, number = None):
-        if number == None:
+        if number is None:
             self.formatted = self.text
         else:
             self.formatted = "{0}. {1}\n".format(number, self.text)
@@ -145,7 +143,7 @@ class HintRepr(object):
         return self.formatted
 
     def __str__(self):
-        return formatted
+        return self.formatted
 
 
 class HintPanel(object):
@@ -175,7 +173,7 @@ class HintPanel(object):
                 hint.begin_line = begin
                 content += "\n" * (begin - current)
                 content += formatted
-                current = begin + height 
+                current = begin + height
         return content
 
     def get_content(self):
@@ -213,7 +211,7 @@ class HintView(object):
         content = []
         for i in range(len(hint_content)):
             if len(arrow_content) <= i:
-                arrow_string = " " * arrow_panel.width
+                arrow_string = " " * self.arrow_panel.width
             else:
                 arrow_string = arrow_content[i]
             hint_string = hint_content[i]
@@ -228,4 +226,3 @@ class HintView(object):
 
     def reload(self, hints):
         self.__init__(self.view, hints, self.text_view, self.height, self.width)
-
