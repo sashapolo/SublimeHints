@@ -109,6 +109,18 @@ class DoubleViewHintsCommand(SublimeHints.HintsRenderer):
         self.hints_file = super(DoubleViewHintsCommand, self).load_file()
         self.hint_view.reload(self.hints_file.hints)
 
+    def hints_in_region(self, region):
+        hint_view = self.hint_view.view
+        lines = hint_view.lines(region)
+        #print lines
+        line_numbers = map(lambda x: (hint_view.rowcol(x.begin()))[0], lines)
+        hints_set = set()
+        for line_number in line_numbers:
+            hint = self.find_hint_repr(line_number)
+            if hint != None:
+                hints_set.add(hint)
+        return list(hints_set)
+
     @classmethod
     def find_by_target_view_id(cls, id):
         for key in cls.activated:

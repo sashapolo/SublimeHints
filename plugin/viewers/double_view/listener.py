@@ -19,17 +19,12 @@ class SelectionListener(sublime_plugin.EventListener):
     def __highlight(self, command):
         hint_view = command.hint_view.view
         selected = hint_view.sel()
-        lines = []
-        for region in selected:
-            lines.extend(hint_view.lines(region))
-        #print lines
-        line_numbers = map(lambda x: (hint_view.rowcol(x.begin()))[0], lines)
-
         command.text_view.erase_regions("text_highlight")
-        for line_number in line_numbers:
-            hint = command.find_hint_repr(line_number)
-            if hint != None:
-                self.__highlight_hint(command, hint)
+        hints = []
+        for region in selected:
+            hints.extend(command.hints_in_region(region))
+        for hint in hints:
+            self.__highlight_hint(command, hint)
 
 
     def __highlight_hint(self, command, hint):
