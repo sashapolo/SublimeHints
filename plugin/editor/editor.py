@@ -29,6 +29,7 @@ class BeginEditHintsCommand(HintsRenderer):
         self.double_view = DoubleViewHintsCommand.find_by_hint_view_id(self.view.id())
         # check if we are editing a double_view panel
         if self.double_view is None:
+            assert hints_file is not None
             self.double_view_edit_mode = False
             self.hints_file = hints_file
             self.hints = hints_file.hints
@@ -61,8 +62,8 @@ class BeginEditHintsCommand(HintsRenderer):
                                          "cells": [[0, 0, 1, 1], [1, 0, 2, 1]]
                                        })
 
-    def create_hint_view(self):
-        result = self.view.window().new_file()
+    def create_hint_view(self, view):
+        result = view.window().new_file()
         result.window().run_command('move_to_group', {"group": 1})
         return result
 
@@ -76,7 +77,7 @@ class BeginEditHintsCommand(HintsRenderer):
 
         hint_counter = 0
         for hint in hints:
-            hint_view = self.create_hint_view()
+            hint_view = self.create_hint_view(text_view)
             hint_counter += 1
             hint_view.set_name("Hint " + str(hint_counter))
             print_hint(hint_view, hint)
