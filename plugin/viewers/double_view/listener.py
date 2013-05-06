@@ -27,7 +27,7 @@ class SelectionListener(sublime_plugin.EventListener):
 
         command.text_view.erase_regions("text_highlight")
         for line_number in line_numbers:
-            hint = command.find_hint(line_number)
+            hint = command.find_hint_repr(line_number)
             if hint != None:
                 self.__highlight_hint(command, hint)
 
