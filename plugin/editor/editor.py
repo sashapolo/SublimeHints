@@ -19,30 +19,23 @@ displayed_hints = {}
 
 
 class BeginEditHintsCommand(HintsRenderer):
-    # _regions_key = "editor"
-
-    # @classmethod
-    # def get_regions_key(cls):
-    #     return cls._regions_key
 
     def render(self, hints_file):
-        self.double_view = DoubleViewHintsCommand.find_by_hint_view_id(self.view.id())
+        double_view = DoubleViewHintsCommand.find_by_hint_view_id(self.view.id())
         # check if we are editing a double_view panel
-        if self.double_view is None:
+        if double_view is None:
             assert hints_file is not None
-            self.double_view_edit_mode = False
             self.hints_file = hints_file
             self.hints = hints_file.hints
             self.set_layout()
             self.print_hints(self.get_hints_in_regions(self.view.sel()), self.view)
         else:
-            self.double_view_edit_mode = True
-            self.hints_file = self.double_view.hints_file
+            self.hints_file = double_view.hints_file
             self.hints = self.hints_file.hints
             hint_set = set()
             for region in self.view.sel():
-                hint_set.update(self.double_view.hints_in_region(region))
-            self.print_hints(hint_set, self.double_view.text_view)
+                hint_set.update(double_view.hints_in_region(region))
+            self.print_hints(hint_set, double_view.text_view)
 
     def get_hints_in_regions(self, regions):
         hint_set = set()
@@ -84,12 +77,7 @@ class BeginEditHintsCommand(HintsRenderer):
             displayed_hints[hint_view.id()] = { "file": self.hints_file,
                                                 "hint": hint,
                                                 "parent_view": text_view,
-                                                "edit_mode": self.double_view_edit_mode,
-                                                "double_view": self.double_view
                                               }
-
-        # highlighter = HintsHighlighter(self.view, hints)
-        # highlighter.highlight_hints(self._regions_key, "string")
 
 
 class StopEditHintsCommand(sublime_plugin.TextCommand):
@@ -99,22 +87,17 @@ class StopEditHintsCommand(sublime_plugin.TextCommand):
             hints_file = displayed_hints[id]["file"]
             hint = displayed_hints[id]["hint"]
             parent_view = displayed_hints[id]["parent_view"]
-            edit_mode = displayed_hints[id]["edit_mode"]
-            double_view = displayed_hints[id]["double_view"]
 
             hint.text = self.view.substr(sublime.Region(0, self.view.size()))
             hints_file.dump_json(parent_view)
             self.view.set_scratch(True)
             self.view.window().run_command("close_file")
 
-            if edit_mode:
-                assert double_view is not None
+            double_view = DoubleViewHintsCommand.find_by_target_view_id(parent_view.id())
+            if double_view is not None:
                 double_view.reload_hint_file()
 
             del displayed_hints[id]
-            # if not displayed_hints:
-            #     highlighter = HintsHighlighter(parent_view)
-            #     highlighter.unhighlight_hints(BeginEditHintsCommand.get_regions_key())
 
 
 class CreateNewHintsFileCommand(sublime_plugin.TextCommand):

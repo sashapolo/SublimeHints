@@ -1,6 +1,5 @@
-import sublime, sublime_plugin
+import sublime
 import SublimeHints
-import hints
 import textwrap
 import synchro
 import arrow
