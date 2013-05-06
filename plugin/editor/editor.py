@@ -7,6 +7,7 @@ Created on Mar 17, 2013
 from SublimeHints import HintsRenderer
 from highlighter import HintsHighlighter
 from hints import Meta, HintFile, Hint
+from viewers.double_view import DoubleViewHintsCommand
 import sublime_plugin
 import sublime
 import os
@@ -25,10 +26,31 @@ class BeginEditHintsCommand(HintsRenderer):
         return cls._regions_key
 
     def render(self, hints_file):
-        self.hints_file = hints_file
-        self.hints = hints_file.hints
-        self.set_layout()
-        self.print_hints()
+        double_view = DoubleViewHintsCommand.find_by_hint_view_id(self.view.id())
+        # check if we are editing a double_view panel
+        if double_view is None:
+            self.hints_file = hints_file
+            self.hints = hints_file.hints
+            self.set_layout()
+            self.print_hints(self.get_hints_in_regions(self.view.sel()))
+        else:
+            self.hints_file = double_view.hints_file
+            self.hints = self.hints_file.hints
+            hint_set = set()
+            for region in self.view.sel():
+                hint_set.update(double_view.hints_in_region(region))
+            self.print_hints(hint_set)
+
+    def get_hints_in_regions(self, regions):
+        hint_set = set()
+        for region in regions:
+            for hint in self.hints:
+                if hint not in hint_set:
+                    for hint_region in hint.places:
+                        if hint_region.intersects(region):
+                            hint_set.add(hint)
+                            break
+        return hint_set
 
     def set_layout(self):
         self.view.window().run_command('set_layout',
@@ -42,7 +64,7 @@ class BeginEditHintsCommand(HintsRenderer):
         result.window().run_command('move_to_group', {"group": 1})
         return result
 
-    def print_hints(self):
+    def print_hints(self, hints):
         def print_hint(view, hint):
             edit = view.begin_edit()
             try:
@@ -50,26 +72,18 @@ class BeginEditHintsCommand(HintsRenderer):
             finally:
                 view.end_edit(edit)
 
-        hint_set = set()
         hint_counter = 0
-        # this piece of code is fucked up
-        for region in self.view.sel():
-            for hint in self.hints:
-                if hint not in hint_set:
-                    for hint_region in hint.places:
-                        if hint_region.intersects(region):
-                            hint_view = self.create_hint_view()
-                            hint_counter += 1
-                            hint_view.set_name("Hint " + str(hint_counter))
-                            print_hint(hint_view, hint)
-                            hint_set.add(hint)
-                            displayed_hints[hint_view.id()] = { "file": self.hints_file,
-                                                                "hint": hint,
-                                                                "parent_view": self.view
-                                                              }
-                            break
+        for hint in hints:
+            hint_view = self.create_hint_view()
+            hint_counter += 1
+            hint_view.set_name("Hint " + str(hint_counter))
+            print_hint(hint_view, hint)
+            displayed_hints[hint_view.id()] = { "file": self.hints_file,
+                                                "hint": hint,
+                                                "parent_view": self.view
+                                              }
 
-        highlighter = HintsHighlighter(self.view, hint_set)
+        highlighter = HintsHighlighter(self.view, hints)
         highlighter.highlight_hints(self._regions_key, "string")
 
 
@@ -102,8 +116,9 @@ class CreateNewHintsFileCommand(sublime_plugin.TextCommand):
 
     def on_done(self, user_input):
         source_file_name = self.view.file_name()
-        meta = Meta(created = datetime.now(),
-                    modified = datetime.now(),
+        now = datetime.now()
+        meta = Meta(created = now,
+                    modified = now,
                     author = user_input,
                     createdWith = "SublimeHints editor v0.1",
                     createdTimestamp = datetime.fromtimestamp(os.path.getctime(source_file_name)),

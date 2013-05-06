@@ -1,6 +1,5 @@
-import sublime, sublime_plugin
+import sublime
 import SublimeHints
-import hints
 import textwrap
 import synchro
 import arrow
@@ -100,7 +99,7 @@ class DoubleViewHintsCommand(SublimeHints.HintsRenderer):
 
     def find_hint(self, line):
         hint = self.find_hint_repr(line)
-        if hint != None:
+        if hint is not None:
             return hint.hint
         else:
             return None
@@ -117,7 +116,7 @@ class DoubleViewHintsCommand(SublimeHints.HintsRenderer):
         hints_set = set()
         for line_number in line_numbers:
             hint = self.find_hint_repr(line_number)
-            if hint != None:
+            if hint is not None:
                 hints_set.add(hint)
         return list(hints_set)
 

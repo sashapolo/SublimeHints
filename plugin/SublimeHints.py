@@ -30,6 +30,10 @@ logger.propagate = False
 #logging.disable(logging.CRITICAL)
 
 
+class HintLoadError(Exception):
+    pass
+
+
 class SublimeUtilMixin(object):
     """Auxiliary mixin class that adds various helper methods
      to indeed rather clumsy Sublime Text API
@@ -158,11 +162,11 @@ class HintsRenderer(SublimeUtilMixin, sublime_plugin.TextCommand):
 
     def run(self, edit):
         self.edit = edit
-        hints_file = self.load_file()
-        if hints_file is None:
-            return
-        else:
+        try:
+            hints_file = self.load_file()
             self.render(hints_file)
+        except (HintLoadError):
+            return
 
     def load_file(self):
         full_path = self.view.file_name()
@@ -172,12 +176,12 @@ class HintsRenderer(SublimeUtilMixin, sublime_plugin.TextCommand):
         hints_file = full_path + ".hints"
         if not os.path.exists(hints_file):
             logger.info("Hint file %s not found", hints_file)
-            return None
+            raise HintLoadError()
         try:
             hints_file = HintFile.load_json(self.view, hints_file)
         except HintFormatError:
             logger.exception("Can't load hint file %s", hints_file)
-            return None
+            raise HintLoadError()
         else:
             logger.debug('HintsRenderer.render() is called')
             return hints_file
