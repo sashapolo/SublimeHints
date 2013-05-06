@@ -33,7 +33,7 @@ class BeginEditHintsCommand(HintsRenderer):
             self.hints_file = hints_file
             self.hints = hints_file.hints
             self.set_layout()
-            self.print_hints(self.get_hints_in_regions(self.view.sel()))
+            self.print_hints(self.get_hints_in_regions(self.view.sel()), self.view)
         else:
             self.double_view_edit_mode = True
             self.hints_file = self.double_view.hints_file
@@ -41,7 +41,7 @@ class BeginEditHintsCommand(HintsRenderer):
             hint_set = set()
             for region in self.view.sel():
                 hint_set.update(self.double_view.hints_in_region(region))
-            self.print_hints(hint_set)
+            self.print_hints(hint_set, self.double_view.text_view)
 
     def get_hints_in_regions(self, regions):
         hint_set = set()
@@ -66,7 +66,7 @@ class BeginEditHintsCommand(HintsRenderer):
         result.window().run_command('move_to_group', {"group": 1})
         return result
 
-    def print_hints(self, hints):
+    def print_hints(self, hints, text_view):
         def print_hint(view, hint):
             edit = view.begin_edit()
             try:
@@ -82,7 +82,7 @@ class BeginEditHintsCommand(HintsRenderer):
             print_hint(hint_view, hint)
             displayed_hints[hint_view.id()] = { "file": self.hints_file,
                                                 "hint": hint,
-                                                "parent_view": self.view,
+                                                "parent_view": text_view,
                                                 "edit_mode": self.double_view_edit_mode,
                                                 "double_view": self.double_view
                                               }
