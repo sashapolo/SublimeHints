@@ -159,14 +159,16 @@ class HintsRenderer(SublimeUtilMixin, sublime_plugin.TextCommand):
     def run(self, edit):
         self.edit = edit
         hints_file = self.load_file()
-        if hints_file == None:
+        if hints_file is None:
             return
         else:
             self.render(hints_file)
-        
 
     def load_file(self):
         full_path = self.view.file_name()
+        if full_path is None:
+            logger.info("Trying to open file of a temporary view")
+            return None
         hints_file = full_path + ".hints"
         if not os.path.exists(hints_file):
             logger.info("Hint file %s not found", hints_file)
@@ -179,7 +181,6 @@ class HintsRenderer(SublimeUtilMixin, sublime_plugin.TextCommand):
         else:
             logger.debug('HintsRenderer.render() is called')
             return hints_file
-            
 
     def render(self, hints_file):
         raise NotImplementedError('HintsRenderer.render() should not be called directly')
