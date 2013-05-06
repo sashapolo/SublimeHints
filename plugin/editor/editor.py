@@ -116,11 +116,9 @@ class CreateNewHintsFileCommand(sublime_plugin.TextCommand):
 class AppendHintCommand(HintsRenderer):
     def render(self, hints_file):
         self.hints_file = hints_file
-        self.view.window().show_input_panel("Hint text:", "", self.on_done, None, None)
-
-    def on_done(self, user_input):
-        hint = Hint(user_input)
+        hint = Hint("")
         for region in self.view.sel():
             hint.places.append(region)
         self.hints_file.hints.append(hint)
         self.hints_file.dump_json(self.view)
+        self.view.run_command("begin_edit_hints")
