@@ -171,7 +171,6 @@ class HintsRenderer(SublimeUtilMixin, sublime_plugin.TextCommand):
     def load_file(self):
         full_path = self.view.file_name()
         if full_path is None:
-            logger.info("Trying to open file of a temporary view")
             return None
         hints_file = full_path + ".hints"
         if not os.path.exists(hints_file):
