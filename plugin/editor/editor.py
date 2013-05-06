@@ -5,13 +5,13 @@ Created on Mar 17, 2013
 '''
 
 from SublimeHints import HintsRenderer
-from highlighter import HintsHighlighter
+# from highlighter import HintsHighlighter
 from hints import Meta, HintFile, Hint
 from viewers.double_view import DoubleViewHintsCommand
+from datetime import datetime
 import sublime_plugin
 import sublime
 import os
-from datetime import datetime
 import hashlib
 
 
@@ -19,11 +19,11 @@ displayed_hints = {}
 
 
 class BeginEditHintsCommand(HintsRenderer):
-    _regions_key = "editor"
+    # _regions_key = "editor"
 
-    @classmethod
-    def get_regions_key(cls):
-        return cls._regions_key
+    # @classmethod
+    # def get_regions_key(cls):
+    #     return cls._regions_key
 
     def render(self, hints_file):
         self.double_view = DoubleViewHintsCommand.find_by_hint_view_id(self.view.id())
@@ -111,9 +111,9 @@ class StopEditHintsCommand(sublime_plugin.TextCommand):
                 double_view.reload_hint_file()
 
             del displayed_hints[id]
-            if not displayed_hints:
-                highlighter = HintsHighlighter(parent_view)
-                highlighter.unhighlight_hints(BeginEditHintsCommand.get_regions_key())
+            # if not displayed_hints:
+            #     highlighter = HintsHighlighter(parent_view)
+            #     highlighter.unhighlight_hints(BeginEditHintsCommand.get_regions_key())
 
 
 class CreateNewHintsFileCommand(sublime_plugin.TextCommand):
