@@ -149,7 +149,7 @@ class HintRepr(object):
         if number is None:
             self.formatted = self.text
         else:
-            self.formatted = "{0}. {1}\n".format(number, self.text)
+            self.formatted = u"{0}. {1}\n".format(number, self.text)
         self.formatted = textwrap.fill(self.formatted, width = self.width)
         self.formatted += "\n"
         self.height = self.formatted.count("\n")
