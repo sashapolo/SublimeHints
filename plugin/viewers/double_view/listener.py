@@ -22,7 +22,7 @@ class SelectionListener(sublime_plugin.EventListener):
         command.text_view.erase_regions("text_highlight")
         hints = []
         for region in selected:
-            hints.extend(command.hints_in_region(region))
+            hints.extend(command.hints_in_region_repr(region))
         for hint in hints:
             self.__highlight_hint(command, hint)
 
