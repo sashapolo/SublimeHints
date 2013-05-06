@@ -151,6 +151,7 @@ class TestCommand(SublimeUtilMixin, sublime_plugin.TextCommand):
 
         logger.info('File type: %s', self.file_type())
 
+
 class HintsRenderer(SublimeUtilMixin, sublime_plugin.TextCommand):
     def __init__(self, *args, **kwargs):
         super(HintsRenderer, self).__init__(*args, **kwargs)
@@ -195,4 +196,4 @@ except ImportError as e:
 
 from viewers.double_view import DoubleViewHintsCommand
 from viewers.double_view import SelectionListener
-from hint_editor import *
+from editor import *

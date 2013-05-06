@@ -6,6 +6,7 @@ from datetime import datetime
 import functools
 import hashlib
 import copy
+import os
 import sublime
 
 ISO8601_DATE_FORMAT = '%Y-%m-%d:%H:%M:%S'
@@ -19,10 +20,15 @@ class HintsFileNotFoundError(Exception):
     pass
 
 
+class SourceFileNotFoundError(Exception):
+    pass
+
+
 class Hint(object):
-    def __init__(self, text, places):
+    def __init__(self, text, places = [], tags = []):
         self.text = text
         self.places = places
+        self.tags = tags
 
     @classmethod
     def from_json(cls, view, json_obj):
@@ -61,19 +67,28 @@ class Hint(object):
 
 class Meta(object):
 
-    def __init__(self, created = None, updated = None, author = 'unknown', md5sum = None, file = None, **kwargs):
+    def __init__(self,
+                 created = None,
+                 modified = None,
+                 author = 'unknown',
+                 createdWith = 'unknown',
+                 createdTimestamp = None,
+                 modifiedTimestamp = None,
+                 md5sum = None,
+                 **kwargs):
         self.created = created
-        self.updated = updated
+        self.modified = modified
         self.author = author
         self.md5sum = md5sum
-        self.file = file
+        self.createdTimestamp = createdTimestamp
+        self.modifiedTimestamp = modifiedTimestamp
         # if kwargs:
         #     raise HintFormatError('Unknown fields: %s' % kwargs)
         self.__dict__.update(kwargs)
 
     @classmethod
     def from_json(cls, json_obj):
-        for timestamp in ('created', 'updated'):
+        for timestamp in ('created', 'updated', 'createdTimestamp', 'modifiedTimestamp'):
             if timestamp in json_obj:
                 try:
                     json_obj[timestamp] = datetime.strptime(json_obj[timestamp], ISO8601_DATE_FORMAT)
@@ -81,14 +96,16 @@ class Meta(object):
                     raise HintFormatError('Illegal time format: %s' % timestamp)
         return cls(**json_obj)
 
-    def to_json(self):
-        self.updated = datetime.now()
-        self.md5sum = 0
-        result = copy.deepcopy(self.__dict__)
-        result["created"] = self.created.strftime(ISO8601_DATE_FORMAT)
-        result["updated"] = self.updated.strftime(ISO8601_DATE_FORMAT)
-        self.md5sum = hashlib.md5(json.dumps(result, sort_keys = True)).hexdigest()
-        result["md5sum"] = self.md5sum
+    def to_json(self, file_name):
+        result = copy.deepcopy(dict((k, v) for k, v in self.__dict__.items() if v is not None))
+        if self.created:
+            result["created"] = self.created.strftime(ISO8601_DATE_FORMAT)
+        if self.modified:
+            result["modified"] = self.modified.strftime(ISO8601_DATE_FORMAT)
+        if self.createdTimestamp:
+            result["createdTimestamp"] = self.createdTimestamp.strftime(ISO8601_DATE_FORMAT)
+        if self.modifiedTimestamp:
+            result["modifiedTimestamp"] = self.modifiedTimestamp.strftime(ISO8601_DATE_FORMAT)
         return result
 
     def __str__(self):
@@ -114,7 +131,11 @@ class HintFile(object):
 
     def dump_json(self, view):
         with open(self.name, 'w') as hints_file:
-            json_obj = self.meta.to_json()
+            source_file_name = os.path.splitext(self.name)[0]
+            if not os.path.exists(source_file_name):
+                raise SourceFileNotFoundError("File %s not found" % source_file_name)
+            self.meta.modified = datetime.fromtimestamp(os.path.getmtime(self.name))
+            json_obj = self.meta.to_json(source_file_name)
             json_obj["hints"] = []
             for hint in self.hints:
                 json_obj["hints"].append(hint.to_json(view))
