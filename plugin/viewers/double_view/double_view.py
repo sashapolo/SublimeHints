@@ -43,7 +43,7 @@ class DoubleViewHintsCommand(SublimeHints.HintsRenderer):
 
     def __activate(self, hints_file):
         self.hints_file = hints_file
-        self.separator = 0.7
+        self.separator = 0.6
         self.text_view = self.view
         self.hint_view = self.__create_double_view__(self.separator)
         self.hint_view_width = self.__calculate_width__(self.hint_view)
