@@ -27,6 +27,11 @@ console_handler.setLevel(logging.DEBUG)
 console_handler.setFormatter(logging.Formatter('[%(levelname)s]:%(name)s: %(message)s'))
 logger.addHandler(console_handler)
 logger.propagate = False
+#logging.disable(logging.CRITICAL)
+
+
+class HintLoadError(Exception):
+    pass
 
 
 class SublimeUtilMixin(object):
@@ -79,16 +84,16 @@ class SublimeUtilMixin(object):
         """
         return self.view.substr(self.line_region(lineno))
 
-    def lines_regions(self, start = 0, end = None):
+    def lines_regions(self, start=0, end=None):
         """Returns lines of buffer as list of elements of type sublime
         .Region"""
         return self.view.lines(self.file_region())[start:end]
 
-    def lines_content(self, start = 0, end = None):
+    def lines_content(self, start=0, end=None):
         """Returns lines of buffer as list of strings"""
         return map(self.view.substr, self.lines_regions(start, end))
 
-    def _initialize_buffer(self, view, content = None, name = None, readonly = False, scratch = False):
+    def _initialize_buffer(self, view, content=None, name=None, readonly=False, scratch=False):
         SublimeUtilMixin.logger.debug('_initialize_buffer() called')
         if content:
             if view.is_loading:
@@ -104,7 +109,7 @@ class SublimeUtilMixin(object):
         view.set_read_only(readonly)
         view.set_scratch(scratch)
 
-    def new_file(self, content = None, name = None, readonly = False, scratch = False):
+    def new_file(self, content=None, name=None, readonly=False, scratch=False):
         """Opens new empty tab and optionally sets its name and fill buffer
         with content.
         Scratch option means that Sublime will not show such file as modified
@@ -114,7 +119,7 @@ class SublimeUtilMixin(object):
         self._initialize_buffer(new_view, content, name, readonly, scratch)
         return new_view
 
-    def temp_file(self, suffix = '', prefix = '', content = None, name = None, readonly = False, scratch = False, focus = False):
+    def temp_file(self, suffix='', prefix='', content=None, name=None, readonly=False, scratch=False, focus=False):
         """Creates new temporary file. Prefix and suffix is added to randomly
         generated name. All other options are the same as in new_file method.
         """
@@ -155,22 +160,32 @@ class HintsRenderer(SublimeUtilMixin, sublime_plugin.TextCommand):
     def __init__(self, *args, **kwargs):
         super(HintsRenderer, self).__init__(*args, **kwargs)
 
-    def run(self, edit):
+    def run(self, edit, **kwargs):
         self.edit = edit
+        try:
+            hints_file = self.load_file()
+            self.render(hints_file, **kwargs)
+        except (HintLoadError):
+            return
+
+    def load_file(self):
         full_path = self.view.file_name()
+        if full_path is None:
+            return None
         hints_file = full_path + ".hints"
         if not os.path.exists(hints_file):
             logger.info("Hint file %s not found", hints_file)
-            return
+            raise HintLoadError()
         try:
             hints_file = HintFile.load_json(self.view, hints_file)
         except HintFormatError:
             logger.exception("Can't load hint file %s", hints_file)
+            raise HintLoadError()
         else:
             logger.debug('HintsRenderer.render() is called')
-            self.render(hints_file)
+            return hints_file
 
-    def render(self, hints_file):
+    def render(self, hints_file, **kwargs):
         raise NotImplementedError('HintsRenderer.render() should not be called directly')
 
 # Miscellaneous commands section
@@ -183,5 +198,6 @@ try:
 except ImportError as e:
     logger.exception("Possibly missing dependency in 'viewers.browser'")
 
-from double_view import *
+from viewers.double_view import DoubleViewHintsCommand
+from viewers.double_view import SelectionListener
 from editor import *

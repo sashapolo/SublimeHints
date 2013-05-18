@@ -1,12 +1,7 @@
 {
-    "updated": "2013-04-13:15:40:23", 
-    "author": "east825", 
-    "created": "2013-02-18:00:00:00", 
-    "md5sum": "fcf57e210ac7b37437d7da40dc3e741e", 
-    "file": null, 
     "hints": [
         {
-            "text": "Ham! Spam! Spam! Spam! Eggs! Sausages!", 
+            "text": "Ham! Spam! Spam! Spam! Eggs!", 
             "places": [
                 [
                     0, 
@@ -20,10 +15,11 @@
                     20, 
                     42
                 ]
-            ]
+            ],
+            "tags": ["ham", "spam"]
         }, 
         {
-            "text": "Dead parrot", 
+            "text": "Fucking pirate", 
             "places": [
                 [
                     3, 
@@ -31,7 +27,8 @@
                     3, 
                     56
                 ]
-            ]
+            ],
+            "tags": ["pirate", "ham", "fuck"]
         }, 
         {
             "text": "Foo bar baz Foo bar baz Foo bar baz Foo bar baz Foo bar baz Foo bar baz Foo bar baz Foo bar baz Foo bar baz Foo bar baz Foo bar baz", 
@@ -48,6 +45,34 @@
                     7, 
                     25
                 ]
+            ],
+            "tags": ["ham"]
+        }, 
+        {
+            "text": "FUCK FUCK FUCK", 
+            "places": [
+                [
+                    24, 
+                    11, 
+                    24, 
+                    21
+                ]
+            ],
+            "tags": ["fuck"]
+        }, 
+        {
+            "text": "Justin Bieber", 
+            "places": [
+                [
+                    40, 
+                    31, 
+                    43, 
+                    29
+                ]
             ]
         }
+    ], 
+    "author": "east825", 
+    "modified": "2013-05-06:18:28:39", 
+    "created": "2013-02-18:00:00:00"
 }
