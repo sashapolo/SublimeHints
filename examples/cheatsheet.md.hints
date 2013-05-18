@@ -1,4 +1,9 @@
 {
+    "updated": "2013-04-13:15:40:23", 
+    "author": "east825", 
+    "created": "2013-02-18:00:00:00", 
+    "md5sum": "fcf57e210ac7b37437d7da40dc3e741e", 
+    "file": null, 
     "hints": [
         {
             "text": "Ham! Spam! Spam! Spam! Eggs! Sausages!", 
@@ -44,43 +49,5 @@
                     25
                 ]
             ]
-        }, 
-        {
-            "text": "FUCK", 
-            "places": [
-                [
-                    16, 
-                    19, 
-                    16, 
-                    23
-                ], 
-                [
-                    30, 
-                    28, 
-                    30, 
-                    33
-                ]
-            ]
-        }, 
-        {
-            "text": "fuck fuck fuck", 
-            "places": [
-                [
-                    8, 
-                    19, 
-                    8, 
-                    25
-                ], 
-                [
-                    22, 
-                    17, 
-                    22, 
-                    21
-                ]
-            ]
         }
-    ], 
-    "author": "east825", 
-    "modified": "2013-05-06:11:58:46", 
-    "created": "2013-02-18:00:00:00"
 }
