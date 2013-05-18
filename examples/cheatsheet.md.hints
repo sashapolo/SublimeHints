@@ -15,7 +15,8 @@
                     20, 
                     42
                 ]
-            ]
+            ],
+            "tags": ["ham", "spam"]
         }, 
         {
             "text": "Fucking pirate", 
@@ -26,7 +27,8 @@
                     3, 
                     56
                 ]
-            ]
+            ],
+            "tags": ["pirate", "ham", "fuck"]
         }, 
         {
             "text": "Foo bar baz Foo bar baz Foo bar baz Foo bar baz Foo bar baz Foo bar baz Foo bar baz Foo bar baz Foo bar baz Foo bar baz Foo bar baz", 
@@ -43,7 +45,8 @@
                     7, 
                     25
                 ]
-            ]
+            ],
+            "tags": ["ham"]
         }, 
         {
             "text": "FUCK FUCK FUCK", 
@@ -54,7 +57,8 @@
                     24, 
                     21
                 ]
-            ]
+            ],
+            "tags": ["fuck"]
         }, 
         {
             "text": "Justin Bieber", 

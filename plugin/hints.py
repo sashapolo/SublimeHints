@@ -51,15 +51,21 @@ class Hint(object):
             places = map(list_to_region, places)
         except (TypeError, IndexError):
             raise HintFormatError('Illegal places format %s' % places)
+        tags = []
+        if 'tags' in  json_obj:
+            tags = json_obj.pop('tags')
         if json_obj:
             raise HintFormatError('Illegal hint format: unknown fields: %s' % json_obj)
-        return cls(text, places)
+        return cls(text, places, tags)
 
     def to_json(self, view):
         def region_to_list(region):
             return list(view.rowcol(region.begin())) + list(view.rowcol(region.end()))
 
-        return {'text': self.text, 'places': map(region_to_list, self.places)}
+        if not self.tags:
+            return {'text': self.text, 'places': map(region_to_list, self.places)}
+        else:
+            return {'text': self.text, 'places': map(region_to_list, self.places), 'tags': self.tags}
 
     def __str__(self):
         return '<Hint: places=%(places)s text="%(text)s">' % self.__dict__

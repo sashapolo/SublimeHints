@@ -11,7 +11,7 @@ class DoubleViewHintsCommand(SublimeHints.HintsRenderer):
     activated = {}
     activate_listener = False
 
-    def render(self, hints_file):
+    def render(self, hints_file, **kwargs):
         id = self.view.id()
         #print id
         for key in DoubleViewHintsCommand.activated:
@@ -139,41 +139,63 @@ class HintRepr(object):
         self.hint = hint
         self.text = hint.text
         self.text_place = hint.places[number]
+        self.tags = hint.tags
         self.formatted = None
         self.width = width
         self.height = None
         self.begin_line = None
         self.format_hint()
 
-    def format_hint(self, number = None):
-        if number is None:
-            self.formatted = self.text
+    def format_hint(self, number = None, with_tags = True):
+        if with_tags:
+            if number is None:
+                self.formatted = self._format_tags() + self.text
+            else:
+                self.formatted = u"{0}. {1}{2}\n".format(number, self._format_tags(), self.text)
         else:
-            self.formatted = u"{0}. {1}\n".format(number, self.text)
-        self.formatted = textwrap.fill(self.formatted, width = self.width)
+            if number is None:
+                self.formatted = self.text
+            else:
+                self.formatted = u"{0}. {2}\n".format(number, self.text)
+        self.formatted = textwrap.fill(self.formatted, width = self.width, replace_whitespace=False)
         self.formatted += "\n"
         self.height = self.formatted.count("\n")
         return self.formatted
+
+    def _format_tags(self):
+        string = u"Tags: "
+        if not self.tags:
+            return "";
+        else:
+            for i, tag in enumerate(self.tags):
+                if i == 0:
+                    string = string + tag
+                else:
+                    string = string + ", " + tag
+            return string + "\nText: "
+
 
     def __str__(self):
         return self.formatted
 
 
 class HintPanel(object):
-    def __init__(self, hints, text_view, width = 80):
+    def __init__(self, hints, text_view, width = 80, with_tags = True):
         self.hints_repr = []
         self.arrows = []
         for hint in hints:
             for i, place in enumerate(hint.places):
                 self.hints_repr.append(HintRepr(hint, number = i, width = width))
         self.hints_repr.sort(None, lambda x: x.text_place.begin())
+        self.with_tags = with_tags
         self.content = self.__form_content__(text_view)
+        
 
     def __form_content__(self, text_view):
         current = 0
         content = str()
         for i, hint in enumerate(self.hints_repr):
-            formatted = hint.format_hint(i + 1)
+            formatted = hint.format_hint(i + 1, self.with_tags)
             height = hint.height
             begin, _ = text_view.rowcol(hint.text_place.begin())
             if current >= begin:
