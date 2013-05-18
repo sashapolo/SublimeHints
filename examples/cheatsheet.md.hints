@@ -1,18 +1,74 @@
 {
-	"created": "2013-02-18:00:00:00",
-	"author": "east825",
-	"hints": [
-		{
-			"text": "Ham! Spam! Spam! Spam! Eggs! Sausages!",
-			"places": [[0, 0, 0, 10], [10, 2, 20, 42]]
-		},
-		{
-			"places": [[3, 12, 3, 80]],
-			"text": "Dead parrot"
-		},
-		{
-			"places": [[3, 12, 3, 80], [4, 12, 7, 80]],
-			"text": "Foo bar baz Foo bar baz Foo bar baz Foo bar baz Foo bar baz Foo bar baz Foo bar baz Foo bar baz Foo bar baz Foo bar baz Foo bar baz"
-		} 
-	]
+    "hints": [
+        {
+            "text": "Ham! Spam! Spam! Spam! Eggs!", 
+            "places": [
+                [
+                    0, 
+                    0, 
+                    0, 
+                    9
+                ], 
+                [
+                    10, 
+                    2, 
+                    20, 
+                    42
+                ]
+            ]
+        }, 
+        {
+            "text": "Fucking pirate", 
+            "places": [
+                [
+                    3, 
+                    12, 
+                    3, 
+                    56
+                ]
+            ]
+        }, 
+        {
+            "text": "Foo bar baz Foo bar baz Foo bar baz Foo bar baz Foo bar baz Foo bar baz Foo bar baz Foo bar baz Foo bar baz Foo bar baz Foo bar baz", 
+            "places": [
+                [
+                    3, 
+                    12, 
+                    3, 
+                    56
+                ], 
+                [
+                    4, 
+                    12, 
+                    7, 
+                    25
+                ]
+            ]
+        }, 
+        {
+            "text": "FUCK FUCK FUCK", 
+            "places": [
+                [
+                    24, 
+                    11, 
+                    24, 
+                    21
+                ]
+            ]
+        }, 
+        {
+            "text": "Justin Bieber", 
+            "places": [
+                [
+                    40, 
+                    31, 
+                    43, 
+                    29
+                ]
+            ]
+        }
+    ], 
+    "author": "east825", 
+    "modified": "2013-05-06:18:28:39", 
+    "created": "2013-02-18:00:00:00"
 }

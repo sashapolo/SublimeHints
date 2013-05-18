@@ -50,9 +50,11 @@ target/
 # Had to bundle nose because it's the most proper way to add it
 # to Sublime's internal Python runtime.
 nose/
-# If it is a symlink
+# Various library symlinks
 nose
 jinja2
+# Symlink to the test directory inside plugin directory
+plugin/test
 
 # KDE Dolphin
 .directory
@@ -62,3 +64,6 @@ jinja2
 
 # Sphinx documentation generation output
 /sphinx-doc/_build/
+
+# Sublime Rope plugin
+.ropeproject/
