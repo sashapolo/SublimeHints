@@ -165,7 +165,7 @@ class HintRepr(object):
     def _format_tags(self):
         string = u"Tags: "
         if not self.tags:
-            return "";
+            return ""
         else:
             for i, tag in enumerate(self.tags):
                 if i == 0:

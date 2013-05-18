@@ -14,7 +14,8 @@ import os
 import hashlib
 
 
-displayed_hints = {}
+_displayed_hints = {}
+_edit_all = False
 
 
 class BeginEditHintsCommand(HintsRenderer):
@@ -27,7 +28,12 @@ class BeginEditHintsCommand(HintsRenderer):
             self.hints_file = hints_file
             self.hints = hints_file.hints
             self.set_layout()
-            self.print_hints(self.get_hints_in_regions(self.view.sel()), self.view)
+            global _edit_all
+            if _edit_all:
+                self.print_hints(self.hints, self.view)
+                _edit_all = False
+            else:
+                self.print_hints(self.get_hints_in_regions(self.view.sel()), self.view)
         else:
             self.hints_file = double_view.hints_file
             self.hints = self.hints_file.hints
@@ -73,19 +79,19 @@ class BeginEditHintsCommand(HintsRenderer):
             hint_counter += 1
             hint_view.set_name("Hint " + str(hint_counter))
             print_hint(hint_view, hint)
-            displayed_hints[hint_view.id()] = { "file": self.hints_file,
-                                                "hint": hint,
-                                                "parent_view": text_view,
-                                              }
+            _displayed_hints[hint_view.id()] = { "file": self.hints_file,
+                                                 "hint": hint,
+                                                 "parent_view": text_view,
+                                               }
 
 
 class StopEditHintsCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         id = self.view.id()
-        if id in displayed_hints:
-            hints_file = displayed_hints[id]["file"]
-            hint = displayed_hints[id]["hint"]
-            parent_view = displayed_hints[id]["parent_view"]
+        if id in _displayed_hints:
+            hints_file = _displayed_hints[id]["file"]
+            hint = _displayed_hints[id]["hint"]
+            parent_view = _displayed_hints[id]["parent_view"]
 
             hint.text = self.view.substr(sublime.Region(0, self.view.size()))
             hints_file.dump_json(parent_view)
@@ -96,7 +102,7 @@ class StopEditHintsCommand(sublime_plugin.TextCommand):
             if double_view is not None:
                 double_view.reload_hint_file()
 
-            del displayed_hints[id]
+            del _displayed_hints[id]
 
 
 class CreateNewHintsFileCommand(sublime_plugin.TextCommand):
@@ -122,6 +128,7 @@ class CreateNewHintsFileCommand(sublime_plugin.TextCommand):
 
 
 class AppendHintCommand(HintsRenderer):
+
     def render(self, hints_file, **kwargs):
         self.hints_file = hints_file
         hint = Hint("")
@@ -129,4 +136,12 @@ class AppendHintCommand(HintsRenderer):
             hint.places.append(region)
         self.hints_file.hints.append(hint)
         self.hints_file.dump_json(self.view)
+        self.view.run_command("begin_edit_hints")
+
+
+class EditAllHintsCommand(sublime_plugin.TextCommand):
+
+    def run(self, edit):
+        global _edit_all
+        _edit_all = True
         self.view.run_command("begin_edit_hints")
