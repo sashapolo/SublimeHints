@@ -66,7 +66,7 @@ class DoubleViewHintsCommand(SublimeHints.HintsRenderer):
         new_file.set_scratch(True)
         new_file.settings().set('word_wrap', False)
         new_file.settings().set('margin', 0)
-        new_file.window().run_command("move_to_group", { "group": 1 })
+        new_file.window().run_command("move_to_group", {"group": 1})
         return new_file
 
     def __calculate_width__(self, view):
@@ -174,7 +174,6 @@ class HintRepr(object):
                     string = string + ", " + tag
             return string + "\nText: "
 
-
     def __str__(self):
         return self.formatted
 
@@ -189,7 +188,6 @@ class HintPanel(object):
         self.hints_repr.sort(None, lambda x: x.text_place.begin())
         self.with_tags = with_tags
         self.content = self.__form_content__(text_view)
-        
 
     def __form_content__(self, text_view):
         current = 0

@@ -4,7 +4,6 @@ Hints object internal representation.
 import json
 from datetime import datetime
 import functools
-import hashlib
 import copy
 import os
 import sublime
@@ -52,7 +51,7 @@ class Hint(object):
         except (TypeError, IndexError):
             raise HintFormatError('Illegal places format %s' % places)
         tags = []
-        if 'tags' in  json_obj:
+        if 'tags' in json_obj:
             tags = json_obj.pop('tags')
         if json_obj:
             raise HintFormatError('Illegal hint format: unknown fields: %s' % json_obj)

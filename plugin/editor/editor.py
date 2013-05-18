@@ -5,7 +5,6 @@ Created on Mar 17, 2013
 '''
 
 from SublimeHints import HintsRenderer
-# from highlighter import HintsHighlighter
 from hints import Meta, HintFile, Hint
 from viewers.double_view import DoubleViewHintsCommand
 from datetime import datetime
@@ -20,7 +19,7 @@ displayed_hints = {}
 
 class BeginEditHintsCommand(HintsRenderer):
 
-    def render(self, hints_file):
+    def render(self, hints_file, **kwargs):
         double_view = DoubleViewHintsCommand.find_by_hint_view_id(self.view.id())
         # check if we are editing a double_view panel
         if double_view is None:
@@ -123,7 +122,7 @@ class CreateNewHintsFileCommand(sublime_plugin.TextCommand):
 
 
 class AppendHintCommand(HintsRenderer):
-    def render(self, hints_file):
+    def render(self, hints_file, **kwargs):
         self.hints_file = hints_file
         hint = Hint("")
         for region in self.view.sel():
