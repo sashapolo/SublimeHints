@@ -160,11 +160,11 @@ class HintsRenderer(SublimeUtilMixin, sublime_plugin.TextCommand):
     def __init__(self, *args, **kwargs):
         super(HintsRenderer, self).__init__(*args, **kwargs)
 
-    def run(self, edit):
+    def run(self, edit, **kwargs):
         self.edit = edit
         try:
             hints_file = self.load_file()
-            self.render(hints_file)
+            self.render(hints_file, **kwargs)
         except (HintLoadError):
             return
 
@@ -185,7 +185,7 @@ class HintsRenderer(SublimeUtilMixin, sublime_plugin.TextCommand):
             logger.debug('HintsRenderer.render() is called')
             return hints_file
 
-    def render(self, hints_file):
+    def render(self, hints_file, **kwargs):
         raise NotImplementedError('HintsRenderer.render() should not be called directly')
 
 # Miscellaneous commands section

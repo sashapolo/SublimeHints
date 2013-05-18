@@ -11,7 +11,7 @@ class DoubleViewHintsCommand(SublimeHints.HintsRenderer):
     activated = {}
     activate_listener = False
 
-    def render(self, hints_file):
+    def render(self, hints_file, **kwargs):
         id = self.view.id()
         #print id
         for key in DoubleViewHintsCommand.activated:
