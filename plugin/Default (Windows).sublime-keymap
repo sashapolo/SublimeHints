@@ -4,6 +4,7 @@
     { "keys": ["ctrl+shift+e"], "command": "stop_edit_hints" },
     { "keys": ["ctrl+shift+n"], "command": "create_new_hints_file" },
     { "keys": ["ctrl+shift+a"], "command": "append_hint" },
+    { "keys": ["ctrl+shift+k"], "command": "delete_hint" },
     { "keys": ["ctrl+shift+v"], "command": "double_view_hints" },
     { "keys": ["ctrl+shift+t"], "command": "edit_all_hints" },
     { "keys": ["ctrl+shift+f"], "command": "hints_menu" }

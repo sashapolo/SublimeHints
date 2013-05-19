@@ -19,12 +19,23 @@ _displayed_hints = {}
 _edit_all = False
 
 
+def _get_hints_in_regions(hints, regions):
+    hint_set = set()
+    for region in regions:
+        for hint in hints:
+            if hint not in hint_set:
+                for hint_region in hint.places:
+                    if hint_region.intersects(region):
+                        hint_set.add(hint)
+                        break
+    return hint_set
+
+
 class BeginEditHintsCommand(HintsRenderer):
     def render(self, hints_file, **kwargs):
         double_view = DoubleViewHintsCommand.find_by_hint_view_id(self.view.id())
         # check if we are editing a double_view panel
         if double_view is None:
-            assert hints_file is not None
             self.hints_file = hints_file
             self.hints = hints_file.hints
             self.set_layout()
@@ -33,7 +44,7 @@ class BeginEditHintsCommand(HintsRenderer):
                 self.print_hints(self.hints, self.view)
                 _edit_all = False
             else:
-                self.print_hints(self.get_hints_in_regions(self.view.sel()), self.view)
+                self.print_hints(_get_hints_in_regions(self.hints, self.view.sel()), self.view)
         else:
             self.hints_file = double_view.hints_file
             self.hints = self.hints_file.hints
@@ -41,17 +52,6 @@ class BeginEditHintsCommand(HintsRenderer):
             for region in self.view.sel():
                 hint_set.update(double_view.hints_in_region(region))
             self.print_hints(hint_set, double_view.text_view)
-
-    def get_hints_in_regions(self, regions):
-        hint_set = set()
-        for region in regions:
-            for hint in self.hints:
-                if hint not in hint_set:
-                    for hint_region in hint.places:
-                        if hint_region.intersects(region):
-                            hint_set.add(hint)
-                            break
-        return hint_set
 
     def set_layout(self):
         self.view.window().run_command('set_layout',
@@ -147,3 +147,13 @@ class EditAllHintsCommand(sublime_plugin.TextCommand):
         global _edit_all
         _edit_all = True
         self.view.run_command("begin_edit_hints")
+
+
+class DeleteHintCommand(HintsRenderer):
+    def render(self, hints_file, **kwargs):
+        hints = _get_hints_in_regions(hints_file.hints, self.view.sel())
+        hints_file.hints = filter(lambda hint: hint not in hints, hints_file.hints)
+        hints_file.dump_json(self.view)
+        double_view = DoubleViewHintsCommand.find_by_target_view_id(self.view.id())
+        if double_view is not None:
+            double_view.reload_hint_file()
