@@ -11,6 +11,7 @@ from datetime import datetime
 import sublime_plugin
 import sublime
 import os
+import re
 import hashlib
 
 
@@ -19,7 +20,6 @@ _edit_all = False
 
 
 class BeginEditHintsCommand(HintsRenderer):
-
     def render(self, hints_file, **kwargs):
         double_view = DoubleViewHintsCommand.find_by_hint_view_id(self.view.id())
         # check if we are editing a double_view panel
@@ -128,10 +128,13 @@ class CreateNewHintsFileCommand(sublime_plugin.TextCommand):
 
 
 class AppendHintCommand(HintsRenderer):
-
     def render(self, hints_file, **kwargs):
         self.hints_file = hints_file
-        hint = Hint("")
+        self.view.window().show_input_panel("Tags:", "", self.on_done, None, None)
+
+    def on_done(self, user_input):
+        tags = re.split(', *', user_input)
+        hint = Hint(text="", tags=tags)
         for region in self.view.sel():
             hint.places.append(region)
         self.hints_file.hints.append(hint)
@@ -140,7 +143,6 @@ class AppendHintCommand(HintsRenderer):
 
 
 class EditAllHintsCommand(sublime_plugin.TextCommand):
-
     def run(self, edit):
         global _edit_all
         _edit_all = True

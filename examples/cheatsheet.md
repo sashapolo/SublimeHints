@@ -9,7 +9,7 @@
 - ctrl+/ - toggle comment
 - ctrl+t - swap words (?)
 - ctrl+k, ctrl+b - toggle sidepanel
-ё
+
 
 Line operations
 ---------------
