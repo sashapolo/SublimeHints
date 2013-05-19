@@ -1,0 +1,11 @@
+[
+    { "caption": "Hints: Show hints menu", "command": "hints_menu"},
+    { "caption": "Hints: Show all hints in double view", "command": "double_view_hints" },
+    { "caption": "Hints: Close double view", "command": "double_view_hints" },
+    { "caption": "Hints: Show all hints in browser", "command": "browser_view" },    
+    { "caption": "Hints: Edit all hints", "command": "edit_all_hints"},
+    { "caption": "Hints: Start editing hints.", "command": "begin_edit_hints"},
+    { "caption": "Hints: Stop editing hints", "command": "stop_edit_hints"},
+    { "caption": "Hints: Create new hints file", "command": "create_new_hints_file"},
+    { "caption": "Hints: Add new hint", "command": "append_hint"}
+]
