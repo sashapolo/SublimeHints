@@ -20,7 +20,7 @@ class DoubleViewHintsCommand(SublimeHints.HintsRenderer):
                 del DoubleViewHintsCommand.activated[key]
                 break
         else:
-            self.__activate(hints_file)
+            self.__activate(hints_file, **kwargs)
 
     def __deactivate(self, command):
         target_file = command.text_view
@@ -41,14 +41,19 @@ class DoubleViewHintsCommand(SublimeHints.HintsRenderer):
         synchronizer.remove_view(hint_file)
         target_file.window().focus_view(target_file)
 
-    def __activate(self, hints_file):
+    def __activate(self, hints_file, **kwargs):
+        if "tags" in kwargs:
+            tags = kwargs["tags"]
         self.hints_file = hints_file
         self.separator = 0.6
         self.text_view = self.view
         self.hint_view = self.__create_double_view__(self.separator)
         self.hint_view_width = self.__calculate_width__(self.hint_view)
         self.hint_view_height = self.__calculate_height__()
-        self.hint_view = HintView(self.hint_view, hints_file.hints,
+        tags = []
+        if "tags" in kwargs:
+            tags = kwargs["tags"]
+        self.hint_view = HintView(self.hint_view, self._filter_hints(tags),
                                   self.text_view, self.hint_view_height,
                                   width = self.hint_view_width)
         #self.__highlight_text__()
@@ -84,6 +89,15 @@ class DoubleViewHintsCommand(SublimeHints.HintsRenderer):
         self.synchro = synchro.Synchronizer(self.text_view, self.hint_view.view)
         self.synchro.run()
         self.view.window().focus_view(self.view)
+
+    def _filter_hints(self, tags):
+        if not tags:
+            return self.hints_file.hints
+        else:
+            hints = self.hints_file.hints
+            for tag in tags:
+                hints = filter(lambda x: tag in x.tags, hints)
+            return hints
 
     def __add_activated(self):
         key = (self.text_view.id(), self.hint_view.view.id())

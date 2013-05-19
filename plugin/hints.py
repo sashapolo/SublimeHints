@@ -67,7 +67,7 @@ class Hint(object):
             return {'text': self.text, 'places': map(region_to_list, self.places), 'tags': self.tags}
 
     def __str__(self):
-        return '<Hint: places=%(places)s text="%(text)s">' % self.__dict__
+        return u'<Hint: places=%(places)s text="%(text)s">' % self.__dict__
 
 
 class Meta(object):
@@ -114,7 +114,7 @@ class Meta(object):
         return result
 
     def __str__(self):
-        return '<Meta:' + ' '.join('%s=%s' % (k, v) for k, v in self.__dict__.items()) + '>'
+        return u'<Meta:' + u' '.join('%s=%s' % (k, v) for k, v in self.__dict__.items()) + u'>'
 
 
 class HintFile(object):
@@ -147,4 +147,5 @@ class HintFile(object):
             json.dump(json_obj, hints_file, indent = 4)
 
     def __str__(self):
-        return '<Hint file for %s (hash=%s)>' % (self.meta.file, self.meta.md5sum)
+        string =  u'<Hint file for %s (hash=%s)>' % (self.name, self.meta.md5sum)
+        return string.encode('utf-8')

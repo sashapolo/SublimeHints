@@ -171,7 +171,8 @@ class HintsRenderer(SublimeUtilMixin, sublime_plugin.TextCommand):
     def load_file(self):
         full_path = self.view.file_name()
         if full_path is None:
-            return None
+            logger.info("Hint file not found")
+            raise HintLoadError()
         hints_file = full_path + ".hints"
         if not os.path.exists(hints_file):
             logger.info("Hint file %s not found", hints_file)
