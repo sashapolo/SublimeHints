@@ -166,14 +166,13 @@ class HintsRenderer(SublimeUtilMixin, sublime_plugin.TextCommand):
             hints_file = self.load_file()
             self.render(hints_file, **kwargs)
         except (HintLoadError):
-            return
+            self.render_scratch(**kwargs)
 
     def load_file(self):
         full_path = self.view.file_name()
         if full_path is None:
-            #logger.info("Hint file not found")
-            #raise HintLoadError()
-            return None
+            logger.info("Hint file not found")
+            raise HintLoadError()
         hints_file = full_path + ".hints"
         if not os.path.exists(hints_file):
             logger.info("Hint file %s not found", hints_file)
@@ -189,6 +188,9 @@ class HintsRenderer(SublimeUtilMixin, sublime_plugin.TextCommand):
 
     def render(self, hints_file, **kwargs):
         raise NotImplementedError('HintsRenderer.render() should not be called directly')
+
+    def render_scratch(self, **kwargs):
+        pass
 
 # Miscellaneous commands section
 try:
