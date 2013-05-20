@@ -1,10 +1,9 @@
-import sublime, sublime_plugin
 import SublimeHints
 from viewers.double_view import DoubleViewHintsCommand
 
 
 class HintsMenuCommand(SublimeHints.HintsRenderer):
-    
+
     def render(self, hints_file, **kwargs):
         self.hints_file = hints_file
         print hints_file
@@ -15,15 +14,13 @@ class HintsMenuCommand(SublimeHints.HintsRenderer):
             commands[0] = ShowDoubleView()
         commands[1] = ShowBrowser()
         commands[2] = EditAllHints()
-        
+
         self.view.window().show_quick_panel(commands.values(), lambda x: self.on_done(commands, x))
-        
+
     def on_done(self, commands, index):
         if index == -1:
             return
         commands[index].on_done(self)
-
-
 
 
 class MenuItem(str):
@@ -46,7 +43,7 @@ class ShowDoubleView(MenuItem):
             for tag in hint.tags:
                 tags.add(tag)
         tags = list(tags)
-        if not tags: 
+        if not tags:
             menu.view.run_command("double_view_hints")
         else:
             tags.insert(0, "All tags...")
@@ -66,7 +63,7 @@ class CloseDoubleView(MenuItem):
         return super(CloseDoubleView, cls).__new__(cls, "Close double view.")
 
     def on_done(self, menu):
-        menu.view.run_command("double_view_hints") 
+        menu.view.run_command("double_view_hints")
 
 
 class ShowBrowser(MenuItem):
@@ -74,7 +71,7 @@ class ShowBrowser(MenuItem):
         return super(ShowBrowser, cls).__new__(cls, "Show hints in browser.")
 
     def on_done(self, menu):
-        menu.view.run_command("browser_view") 
+        menu.view.run_command("browser_view")
 
 
 class EditAllHints(MenuItem):
@@ -82,4 +79,4 @@ class EditAllHints(MenuItem):
         return super(EditAllHints, cls).__new__(cls, "Edit all hints.")
 
     def on_done(self, menu):
-        menu.view.run_command("edit_all_hints")   
+        menu.view.run_command("edit_all_hints")
