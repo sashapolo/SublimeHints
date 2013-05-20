@@ -53,6 +53,9 @@ class BeginEditHintsCommand(HintsRenderer):
                 hint_set.update(double_view.hints_in_region(region))
             self.print_hints(hint_set, double_view.text_view)
 
+    def renderScratch(self, **kwargs):
+        self.render(None, **kwargs)
+
     def set_layout(self):
         self.view.window().run_command('set_layout',
                                        { "cols":  [0.0, 0.6, 1.0],
