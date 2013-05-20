@@ -72,7 +72,7 @@
             ]
         }, 
         {
-            "text": "Justin Bieber", 
+            "text": "Justin Bieber sucks", 
             "places": [
                 [
                     40, 
@@ -81,24 +81,9 @@
                     29
                 ]
             ]
-        }, 
-        {
-            "text": "ham fuck", 
-            "places": [
-                [
-                    18, 
-                    2, 
-                    18, 
-                    31
-                ]
-            ], 
-            "tags": [
-                "ham", 
-                "fuck"
-            ]
         }
     ], 
     "author": "east825", 
-    "modified": "2013-05-20:14:31:41", 
+    "modified": "2013-05-20:13:33:29", 
     "created": "2013-02-18:00:00:00"
 }
