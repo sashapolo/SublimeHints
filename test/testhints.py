@@ -55,3 +55,19 @@ class TestHintsLoader(object):
             logging.error("Hint file %s not found", hints_file_name)
             return
         HintFile.load_json(test._current_view, hints_file_name)
+		
+	
+	@raises(HintFormatError)
+    def test_wrong_data_format_hint(self):
+        """Trying to load file with wrong data format"""
+        hints_file_name = 'test/hintfiles/wrong_data_format.hints'
+        if not os.path.exists(hints_file_name):
+            logging.error("Hint file %s not found", hints_file_name)
+            return
+        HintFile.load_json(test._current_view, hints_file_name)
+        """try:
+            HintFile.load_json(test._current_view, hints_file_name)
+        except HintFormatError as e:
+            logging.error(e[:20])
+            assert(e[:20]=='Illegal time format:')
+        assert(False)"""
