@@ -147,5 +147,5 @@ class HintFile(object):
             json.dump(json_obj, hints_file, indent = 4)
 
     def __str__(self):
-        string =  u'<Hint file for %s (hash=%s)>' % (self.name, self.meta.md5sum)
+        string = u'<Hint file for %s (hash=%s)>' % (self.name, self.meta.md5sum)
         return string.encode('utf-8')

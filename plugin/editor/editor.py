@@ -53,6 +53,9 @@ class BeginEditHintsCommand(HintsRenderer):
                 hint_set.update(double_view.hints_in_region(region))
             self.print_hints(hint_set, double_view.text_view)
 
+    def render_scratch(self, **kwargs):
+        self.render(None, **kwargs)
+
     def set_layout(self):
         self.view.window().run_command('set_layout',
                                        { "cols":  [0.0, 0.6, 1.0],
@@ -63,6 +66,7 @@ class BeginEditHintsCommand(HintsRenderer):
     def create_hint_view(self, view):
         result = view.window().new_file()
         result.window().run_command('move_to_group', {"group": 1})
+        result.set_scratch(True)
         return result
 
     def print_hints(self, hints, text_view):
@@ -85,7 +89,7 @@ class BeginEditHintsCommand(HintsRenderer):
                                                }
 
 
-class StopEditHintsCommand(sublime_plugin.TextCommand):
+class StopEditHintCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         id = self.view.id()
         if id in _displayed_hints:
@@ -95,7 +99,6 @@ class StopEditHintsCommand(sublime_plugin.TextCommand):
 
             hint.text = self.view.substr(sublime.Region(0, self.view.size()))
             hints_file.dump_json(parent_view)
-            self.view.set_scratch(True)
             self.view.window().run_command("close_file")
 
             double_view = DoubleViewHintsCommand.find_by_target_view_id(parent_view.id())

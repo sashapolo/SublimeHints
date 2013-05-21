@@ -1,7 +1,7 @@
 [
     { "keys": ["ctrl+shift+b"], "command": "browser_view" },
     { "keys": ["ctrl+shift+d"], "command": "begin_edit_hints" },
-    { "keys": ["ctrl+shift+e"], "command": "stop_edit_hints" },
+    { "keys": ["ctrl+shift+e"], "command": "stop_edit_hint" },
     { "keys": ["ctrl+shift+n"], "command": "create_new_hints_file" },
     { "keys": ["ctrl+shift+a"], "command": "append_hint" },
     { "keys": ["ctrl+shift+k"], "command": "delete_hint" },
