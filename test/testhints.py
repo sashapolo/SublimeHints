@@ -46,3 +46,12 @@ class TestHintsLoader(object):
             logging.error("Hint file %s not found", hints_file_name)
             return
         HintFile.load_json(test._current_view, hints_file_name)
+		
+	@raises(ValueError)
+    def test_random_hint_context(self):
+        """Trying to load file with random content. Expecting HintFormatError exception riseing """
+        hints_file_name = 'test/hintfiles/random.hints'
+        if not os.path.exists(hints_file_name):
+            logging.error("Hint file %s not found", hints_file_name)
+            return
+        HintFile.load_json(test._current_view, hints_file_name)

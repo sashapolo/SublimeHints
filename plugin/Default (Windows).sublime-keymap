@@ -7,5 +7,6 @@
     { "keys": ["ctrl+shift+k"], "command": "delete_hint" },
     { "keys": ["ctrl+shift+v"], "command": "double_view_hints" },
     { "keys": ["ctrl+shift+t"], "command": "edit_all_hints" },
-    { "keys": ["ctrl+shift+f"], "command": "hints_menu" }
+    { "keys": ["ctrl+shift+f"], "command": "hints_menu" },
+	{"keys": ["ctrl+shift+z"], "command": "test_plugin"}
 ]
