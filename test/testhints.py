@@ -79,3 +79,14 @@ class TestHintsLoader(object):
             logging.error("Hint file %s not found", hints_file_name)
             return
         HintFile.load_json(test._current_view, hints_file_name)
+
+    @raises(HintFormatError)
+    def test_unknown_key(self):
+        """Asserts that HintFormatError is raised when given JSON
+        has unknown key in hint
+        """
+        hints_file_name = 'test/hintfiles/unknown_keys_in_hint.hints'
+        if not os.path.exists(hints_file_name):
+            logging.error("Hint file %s not found", hints_file_name)
+            return
+        HintFile.load_json(test._current_view, hints_file_name)
