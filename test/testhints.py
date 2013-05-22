@@ -59,6 +59,17 @@ class TestHintsLoader(object):
         HintFile.load_json(test._current_view, hints_file_name)
 
     @raises(HintFormatError)
+    def test_illegal_places(self):
+        """Asserts that HintFormatError is raised when given JSON
+        has illegal value by "places" key in hint
+        """
+        hints_file_name = 'test/hintfiles/illegal_places_in_hint.hints'
+        if not os.path.exists(hints_file_name):
+            logging.error("Hint file %s not found", hints_file_name)
+            return
+        HintFile.load_json(test._current_view, hints_file_name)
+
+    @raises(HintFormatError)
     def test_missing_text(self):
         """Asserts that HintFormatError is raised when given JSON
         doesn't have "text" key in hint

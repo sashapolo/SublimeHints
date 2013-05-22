@@ -1,0 +1,10 @@
+{
+    "created": "2013-05-22:10:42:25",
+    "author": "yaromir",
+    "hints": [
+    {
+        "text": "There is a text, but there are no places",
+        "places": [ [abc, 0, 3, 80], [5, 10, 9, def] ]
+    }
+    ]
+}
