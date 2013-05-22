@@ -80,12 +80,30 @@ class TestHintsLoader(object):
             return
         HintFile.load_json(test._current_view, hints_file_name)
 
+    @raises(ValueError)
+    def test_random_hint_context(self):
+        """Trying to load file with random content. Expecting HintFormatError exception riseing """
+        hints_file_name = 'test/hintfiles/random.hints'
+        if not os.path.exists(hints_file_name):
+            logging.error("Hint file %s not found", hints_file_name)
+            return
+        HintFile.load_json(test._current_view, hints_file_name)
+
     @raises(HintFormatError)
     def test_unknown_key(self):
         """Asserts that HintFormatError is raised when given JSON
         has unknown key in hint
         """
         hints_file_name = 'test/hintfiles/unknown_keys_in_hint.hints'
+        if not os.path.exists(hints_file_name):
+            logging.error("Hint file %s not found", hints_file_name)
+            return
+        HintFile.load_json(test._current_view, hints_file_name)
+
+    @raises(HintFormatError)
+    def test_wrong_data_format_hint(self):
+        """Trying to load file with wrong data format"""
+        hints_file_name = 'test/hintfiles/wrong_data_format.hints'
         if not os.path.exists(hints_file_name):
             logging.error("Hint file %s not found", hints_file_name)
             return
