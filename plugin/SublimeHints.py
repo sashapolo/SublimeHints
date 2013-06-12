@@ -13,9 +13,12 @@ import sublime_plugin
 # NOTE: it can't be determined as os.path.dirname(__file__) in sublime interpreter
 PLUGIN_DIRECTORY = os.path.join(sublime.packages_path(), __name__)
 LIB_DIRECTORY = os.path.join(PLUGIN_DIRECTORY, 'lib')
+# ToDo: Move coverage.py path addition to the TestPluginCommand run() ?
+COVERAGEPY_DIRECTORY = os.path.join(LIB_DIRECTORY, 'coveragepy')
 if PLUGIN_DIRECTORY not in sys.path:
     sys.path.insert(0, PLUGIN_DIRECTORY)
     sys.path.insert(0, LIB_DIRECTORY)
+    sys.path.insert(0, COVERAGEPY_DIRECTORY)
 
 # Logging setup
 

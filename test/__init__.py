@@ -11,8 +11,13 @@ class TestPluginCommand(sublime_plugin.TextCommand):
     """
 
     def run(self, edit):
+        import coverage
         import nose
         import SublimeHints
         global _current_view
         _current_view = self.view
+        cov = coverage.coverage()
+        cov.start()
         nose.run(argv=['--where', os.path.join(SublimeHints.PLUGIN_DIRECTORY, 'test')])
+        cov.stop()
+        cov.html_report(directory='test/covhtml')

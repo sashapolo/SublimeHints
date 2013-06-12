@@ -45,16 +45,10 @@ doc/spec/docbook/docbook-xml-4.5
 doc/spec/docbook/docbook-xsl-1.78.0
 doc/spec/docbook/output
 
-# NoseXUnit
-target/
-# Had to bundle nose because it's the most proper way to add it
-# to Sublime's internal Python runtime.
-nose/
-# Various library symlinks
-nose
-jinja2
 # Symlink to the test directory inside plugin directory
 plugin/test
+# Coverage report
+test/covhtml/
 
 # KDE Dolphin
 .directory
